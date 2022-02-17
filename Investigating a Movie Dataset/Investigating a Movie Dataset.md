@@ -18,7 +18,6 @@ What are the properties of high revenue films? Using data from The Movie Databas
 > * Are high revenue films highly rated?
 
 
-
 ```python
 import pandas as pd
 import numpy as np
@@ -30,23 +29,6 @@ df_movies = pd.read_csv(r"C:\Users\bsear\Desktop\Class Assignments\movies.csv")
 df_movies.head(1)
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -102,9 +84,6 @@ df_movies.head(1)
   </tbody>
 </table>
 <p>1 rows × 21 columns</p>
-</div>
-
-
 
 ___
 
@@ -154,31 +133,12 @@ df_movies.info()
     dtypes: float64(4), int64(6), object(11)
     memory usage: 1.7+ MB
     
-
-
 ```python
 #Removing extraneous data columns here
 df_movies.drop(['id', 'imdb_id', 'homepage','tagline','overview'], axis=1, inplace=True)
 df_movies.head()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -302,8 +262,6 @@ df_movies.head()
 </div>
 
 
-
-
 ```python
 #checking to see if there are duplicates and removing them
 df_movies.drop_duplicates(inplace=True)
@@ -352,23 +310,6 @@ list(df_movies.isnull().sum().items())
 df_movies.describe()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -486,8 +427,6 @@ df_movies.describe()
 </div>
 
 
-
-
 ```python
 #even though the previous null data check came back as 0 for my chosen variables, the describe function shows
 #that my minimum value for revenue_adj is 0 - which seems odd. Here I take a closer look
@@ -495,23 +434,6 @@ null_data=df_movies[df_movies.isnull().any(axis=1)]
 null_data.head(1)
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -559,30 +481,11 @@ null_data.head(1)
 </div>
 
 
-
-
 ```python
 #why does the runtime column have 0 as a minimum runtime?
 df_movies[df_movies['runtime']==df_movies['runtime'].min()].head(1)
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -630,8 +533,6 @@ df_movies[df_movies['runtime']==df_movies['runtime'].min()].head(1)
 </div>
 
 
-
-
 ```python
 #The other variables in the table indicate that those films with "0" runtime must actually be null values
 #Here I replaced the '0' values with null
@@ -651,7 +552,6 @@ df_movies['runtime'].describe()
     75%        112.000000
     max        900.000000
     Name: runtime, dtype: float64
-
 
 
 
@@ -686,22 +586,6 @@ df_movies[df_movies['revenue_adj']==df_movies['revenue_adj'].min()].head(1)
 ```
 
 
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -886,19 +770,6 @@ df_movies.head(1) #testing what it looks like
 
 
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
 </style>
 <table border="1" class="dataframe">
   <thead>
@@ -949,8 +820,6 @@ df_movies.head(1) #testing what it looks like
 </div>
 
 
-
-
 ```python
 #pie chart visual
 film_pie = df_movies['release_decade'].value_counts().plot(kind='pie', 
@@ -980,8 +849,6 @@ film_pie.set_ylabel(" ")
 decade_revenue_means = df_movies.groupby('release_decade')['revenue_adj'].mean()
 decade_revenue_means
 ```
-
-
 
 
     release_decade
@@ -1108,22 +975,6 @@ df_movies[df_movies['popularity']==df_movies['popularity'].min()]
 ```
 
 
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1214,21 +1065,6 @@ df_movies.head(1) #testing what it looks like
 
 
 
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1332,6 +1168,7 @@ bar_plot([1,2,3], popularity_revenue_means, popularity_level,'Popularity Level',
 
 ____
 
+<a id='q3'></a>
 __3. Is there a positive relationship between runtime and revenue (adj)?__
 
 > Do long movies make more money?
@@ -1383,22 +1220,6 @@ df_movies.head(1) #testing what it looks like
 ```
 
 
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1540,6 +1361,7 @@ bar_plot([1,2,3,4], runtime_revenue_means, movie_lengths,'Film Runtime',
 
 > __Thought:__ Again, using this kind of visualization is a great way to see where difference exists. A pie chart might also be an interesting visual for this output, as well; particularly since there is one value much greater than the rest. I a little suprrised by the result. There is clearly a jump in revenue for "long" films. "Long" films are at least 1 hour and 51 minutes long.
 
+<a id='q4'></a>
 __4. Are high revenue (adj) films highly rated?__
 
 > Just because a movie makes a lot of money - does it mean that it's also highly rated?
@@ -1590,21 +1412,6 @@ df_movies.head(1)
 
 
 
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1657,7 +1464,7 @@ df_movies.head(1)
     </tr>
   </tbody>
 </table>
-</div>
+
 
 
 
