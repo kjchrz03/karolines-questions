@@ -1,6 +1,0 @@
-
-@import "{{ jekyll-theme-architect }}";
-
-.inner {
-  max-width: 75%;
-}
