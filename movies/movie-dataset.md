@@ -17,8 +17,6 @@ What are the properties of high revenue films? Using data from The Movie Databas
 > * Is there a positive relationship between runtime and revenue? Is it worth it to produce a long film?
 > * Are high revenue films highly rated?
 
-
-
 ```python
 import pandas as pd
 import numpy as np
@@ -30,23 +28,6 @@ df_movies = pd.read_csv(r"C:\Users\bsear\Desktop\Class Assignments\movies.csv")
 df_movies.head(1)
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -102,9 +83,6 @@ df_movies.head(1)
   </tbody>
 </table>
 <p>1 rows × 21 columns</p>
-</div>
-
-
 
 ___
 
@@ -162,23 +140,6 @@ df_movies.drop(['id', 'imdb_id', 'homepage','tagline','overview'], axis=1, inpla
 df_movies.head()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -299,24 +260,13 @@ df_movies.head()
     </tr>
   </tbody>
 </table>
-</div>
-
-
-
 
 ```python
 #checking to see if there are duplicates and removing them
 df_movies.drop_duplicates(inplace=True)
 sum(df_movies.duplicated())
 ```
-
-
-
-
     0
-
-
-
 
 ```python
 #check for null values, particularly in my chosen variables
@@ -343,32 +293,11 @@ list(df_movies.isnull().sum().items())
      ('budget_adj', 0),
      ('revenue_adj', 0)]
 
-
-
-
 ```python
 #before starting my analysis, I want to investigate the lack of null-values just a little more.
 #this serves as a double check.
 df_movies.describe()
 ```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -483,10 +412,6 @@ df_movies.describe()
     </tr>
   </tbody>
 </table>
-</div>
-
-
-
 
 ```python
 #even though the previous null data check came back as 0 for my chosen variables, the describe function shows
@@ -494,24 +419,6 @@ df_movies.describe()
 null_data=df_movies[df_movies.isnull().any(axis=1)]
 null_data.head(1)
 ```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -556,33 +463,12 @@ null_data.head(1)
     </tr>
   </tbody>
 </table>
-</div>
-
-
-
 
 ```python
 #why does the runtime column have 0 as a minimum runtime?
 df_movies[df_movies['runtime']==df_movies['runtime'].min()].head(1)
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -627,7 +513,6 @@ df_movies[df_movies['runtime']==df_movies['runtime'].min()].head(1)
     </tr>
   </tbody>
 </table>
-</div>
 
 
 
@@ -663,9 +548,6 @@ df_movies['runtime'].fillna(runtime_mean, inplace = True)
 df_movies['runtime'].describe()
 ```
 
-
-
-
     count    10865.000000
     mean       102.363855
     std         30.904039
@@ -676,9 +558,6 @@ df_movies['runtime'].describe()
     max        900.000000
     Name: runtime, dtype: float64
 
-
-
-
 ```python
 #why does the adjusted revenue column have 0 as a minimum value?
 #Just like with runtime, the adjusted revenue column also has '0' values where null is more appropriate
@@ -686,22 +565,6 @@ df_movies[df_movies['revenue_adj']==df_movies['revenue_adj'].min()].head(1)
 ```
 
 
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -746,7 +609,6 @@ df_movies[df_movies['revenue_adj']==df_movies['revenue_adj'].min()].head(1)
     </tr>
   </tbody>
 </table>
-</div>
 
 
 
