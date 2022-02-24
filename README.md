@@ -5,7 +5,8 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 <ul>
 <li><a href="https://count.co/notebook/x62Ok6D7c3G"> Hockey pt. 1(SQL/BigQuery)</a></li>
 <li><a href="movies/movie-dataset" title="Movies">Movies (python)</a></li>
-<li>Books</li>
+<li>Books - coming soon!</li>
+ <li>Using data in my shop</li>
 <li>General Exploration</li>
 </ul>
 
@@ -15,3 +16,5 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 <li><a href="https://prezi.com/3fpona8wzwey/assessment-its-not-that-scary/">Assessment: It's Not That Scary!</a></li>
 <li><a href="https://prezi.com/p/edit/oapqhyaeypfx/">Using data to guide a mission and fulfill goals</a></li>
 </ul>
+
+
