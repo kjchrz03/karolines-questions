@@ -17,7 +17,7 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 <li><a href="https://prezi.com/p/edit/oapqhyaeypfx/">Using data to guide a mission and fulfill goals</a></li>
 </ul>
 
-<ul> <a href="https://www.hackerrank.com/kjchrz03"> Find me on HackerRank</a></li> </ul>
+<ul> <a href="https://www.hackerrank.com/kjchrz03"> Find me on HackerRank</a></ul>
 
 
 
