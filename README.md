@@ -3,7 +3,7 @@
 I have a lot of interests and I am _really_ interested in learning about why I like them so much. I'm a data nerd at heart and I hope you enjoy my questions.
 
 <ul>
-<li><a href="https://count.co/notebook/x62Ok6D7c3G"> Hockey pt. 1(SQL/BigQuery)</a></li>
+<li><a href="https://count.co/notebook/8n74Yg1kcg7"> Hockey pt. 1(SQL/BigQuery)</a></li>
 <li><a href="movies/movie-dataset" title="Movies">Movies (python)</a></li>
 <li>Books - coming soon!</li>
  <li>Using data in my shop</li>
