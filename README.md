@@ -5,9 +5,8 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 <ul>
   <li><a href="https://count.co/notebook/MILs8MtCS6I"> Hockey Questions (SQL/BigQuery)</a></li>
   <li><a href="movies/movie-dataset" title="Movies">Movies (Python)</a></li>
-  <li>Books - coming soon!</li>
   <li><a href="https://docs.google.com/spreadsheets/d/1h26GOHrBq-TGq8y-wTKYUevwXrYd3yxNVyrjaNYL0Q0/edit?usp=sharing"> Bookkeeping for my ecommerce shop (Excel/Google Sheets)</a></li>
-  
+  <li><a href="go_bikes/GoBikes" title="GoBikes">GoBike Rentals: Visualizations (Python/Jupyter)</a></li>
 </ul>
 
 ## I also enjoy presenting about my data:
