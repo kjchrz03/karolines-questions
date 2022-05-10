@@ -7,7 +7,7 @@ I have a lot of interests and I am _really_ interested in learning about why I l
   <li><a href="movies/movie-dataset" title="Movies">Movies (Python)</a></li>
   <li>Books - coming soon!</li>
   <li><a href="https://docs.google.com/spreadsheets/d/1h26GOHrBq-TGq8y-wTKYUevwXrYd3yxNVyrjaNYL0Q0/edit?usp=sharing"> Bookkeeping for my ecommerce shop (Excel/Google Sheets)</a></li>
-  <li>General Exploration</li>
+  
 </ul>
 
 ## I also enjoy presenting about my data:
