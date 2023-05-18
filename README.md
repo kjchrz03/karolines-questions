@@ -3,7 +3,7 @@
 I have a lot of interests and I am _really_ interested in learning about why I like them so much. I'm a data nerd at heart and I hope you enjoy my questions.
 
 <ul>
-  <li><a href="https://count.co/notebook/MILs8MtCS6I"> Hockey Questions (SQL/BigQuery)</a></li>
+  <li><a href="https://count.co/notebook/MILs8MtCS6I"> Charlie Coyle's Impact on the 2021-2022 Boston Bruins (SQL/BigQuery)</a></li>
   <li><a href="movies/movie-dataset" title="Movies">Movies (Python)</a></li>
   <li><a href="https://docs.google.com/spreadsheets/d/1h26GOHrBq-TGq8y-wTKYUevwXrYd3yxNVyrjaNYL0Q0/edit?usp=sharing"> Bookkeeping for my ecommerce shop (Excel/Google Sheets)</a></li>
   <li><a href="go_bikes/GoBikes" title="GoBikes">GoBike Rentals: Visualizations (Python/Jupyter)</a></li>
@@ -19,6 +19,15 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 ## You can view my completed certificates here:
 <ul>
   <li><a href="https://confirm.udacity.com/KKCYTZS4">Udacity Data Analyst Nanodegree Program</a></li>
+</ul>
+<ul>
+  <li><a href="https://www.hackerrank.com/certificates/89b0fd2b021a">HackerRank SQL(Advanced) Certificate</a></li>
+</ul>
+<ul>
+  <li><a href="https://www.hackerrank.com/certificates/e0f4c9f8af33">HackerRank SQL(Intermediate) Certificate</a></li>
+</ul>
+<ul>
+  <li><a href="https://www.hackerrank.com/certificates/787bdc4fdd3a">HackerRank SQL(Basic) Certificate</a></li>
 </ul>
 
 ## Find me online here: 
