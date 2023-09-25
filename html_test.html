@@ -1,0 +1,1261 @@
+<html><head><style>body {
+   color: black;
+}
+</style></head><body><h1 id="part-i-gobike-usage-analysis">Part I - GoBike Usage Analysis</h1>
+<h2 id="by-karoline-sears">by Karoline Sears</h2>
+<h2 id="introduction">Introduction</h2>
+<blockquote>
+<p>Bike share programs are a popular mode of transportation in large cities. The Ford GoBike system in San Francisco, California is a growing fleet managed by the <strong><a href="https://mtc.ca.gov/tags/ford-gobike">Metropolitan Transportation Commission</a></strong>. This analysis will explore who is using the bikeshare program, where it&#39;s being used, and any other interesting information about the program.</p>
+</blockquote>
+<h2 id="preliminary-wrangling">Preliminary Wrangling</h2>
+<pre><code class="lang-python"># <span class="hljs-keyword">import</span> all packages <span class="hljs-built_in">and</span> set plots to be embedded inline
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">import</span> seaborn <span class="hljs-keyword">as</span> sb
+
+%matplotlib inline
+
+df = pd.read_csv(<span class="hljs-string">'201902-fordgobike-tripdata.csv'</span>)
+df.head()
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>duration_sec</th>
+      <th>start_time</th>
+      <th>end_time</th>
+      <th>start_station_id</th>
+      <th>start_station_name</th>
+      <th>start_station_latitude</th>
+      <th>start_station_longitude</th>
+      <th>end_station_id</th>
+      <th>end_station_name</th>
+      <th>end_station_latitude</th>
+      <th>end_station_longitude</th>
+      <th>bike_id</th>
+      <th>user_type</th>
+      <th>member_birth_year</th>
+      <th>member_gender</th>
+      <th>bike_share_for_all_trip</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>52185</td>
+      <td>2019-02-28 17:32:10.1450</td>
+      <td>2019-03-01 08:01:55.9750</td>
+      <td>21.0</td>
+      <td>Montgomery St BART Station (Market St at 2nd St)</td>
+      <td>37.789625</td>
+      <td>-122.400811</td>
+      <td>13.0</td>
+      <td>Commercial St at Montgomery St</td>
+      <td>37.794231</td>
+      <td>-122.402923</td>
+      <td>4902</td>
+      <td>Customer</td>
+      <td>1984.0</td>
+      <td>Male</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>42521</td>
+      <td>2019-02-28 18:53:21.7890</td>
+      <td>2019-03-01 06:42:03.0560</td>
+      <td>23.0</td>
+      <td>The Embarcadero at Steuart St</td>
+      <td>37.791464</td>
+      <td>-122.391034</td>
+      <td>81.0</td>
+      <td>Berry St at 4th St</td>
+      <td>37.775880</td>
+      <td>-122.393170</td>
+      <td>2535</td>
+      <td>Customer</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>61854</td>
+      <td>2019-02-28 12:13:13.2180</td>
+      <td>2019-03-01 05:24:08.1460</td>
+      <td>86.0</td>
+      <td>Market St at Dolores St</td>
+      <td>37.769305</td>
+      <td>-122.426826</td>
+      <td>3.0</td>
+      <td>Powell St BART Station (Market St at 4th St)</td>
+      <td>37.786375</td>
+      <td>-122.404904</td>
+      <td>5905</td>
+      <td>Customer</td>
+      <td>1972.0</td>
+      <td>Male</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>36490</td>
+      <td>2019-02-28 17:54:26.0100</td>
+      <td>2019-03-01 04:02:36.8420</td>
+      <td>375.0</td>
+      <td>Grove St at Masonic Ave</td>
+      <td>37.774836</td>
+      <td>-122.446546</td>
+      <td>70.0</td>
+      <td>Central Ave at Fell St</td>
+      <td>37.773311</td>
+      <td>-122.444293</td>
+      <td>6638</td>
+      <td>Subscriber</td>
+      <td>1989.0</td>
+      <td>Other</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1585</td>
+      <td>2019-02-28 23:54:18.5490</td>
+      <td>2019-03-01 00:20:44.0740</td>
+      <td>7.0</td>
+      <td>Frank H Ogawa Plaza</td>
+      <td>37.804562</td>
+      <td>-122.271738</td>
+      <td>222.0</td>
+      <td>10th Ave at E 15th St</td>
+      <td>37.792714</td>
+      <td>-122.248780</td>
+      <td>4898</td>
+      <td>Subscriber</td>
+      <td>1974.0</td>
+      <td>Male</td>
+      <td>Yes</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+<pre><code class="lang-python"><span class="hljs-selector-tag">df</span><span class="hljs-selector-class">.shape</span>
+</code></pre>
+<pre><code>(<span class="hljs-number">183412</span>, <span class="hljs-number">16</span>)
+</code></pre><pre><code class="lang-python"><span class="hljs-comment">#a quick review of the fields and data types</span>
+df.<span class="hljs-keyword">info</span>()
+</code></pre>
+<pre><code>&lt;<span class="hljs-class"><span class="hljs-keyword">class</span> '<span class="hljs-title">pandas</span>.<span class="hljs-title">core</span>.<span class="hljs-title">frame</span>.<span class="hljs-title">DataFrame</span>'<span class="hljs-title">&gt;</span></span>
+<span class="hljs-type">RangeIndex</span>: <span class="hljs-number">183412</span> entries, <span class="hljs-number">0</span> to <span class="hljs-number">183411</span>
+<span class="hljs-type">Data</span> columns (total <span class="hljs-number">16</span> columns):
+duration_sec               <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> int64
+start_time                 <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+end_time                   <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+start_station_id           <span class="hljs-number">183215</span> non-<span class="hljs-literal">null</span> float64
+start_station_name         <span class="hljs-number">183215</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+start_station_latitude     <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> float64
+start_station_longitude    <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> float64
+end_station_id             <span class="hljs-number">183215</span> non-<span class="hljs-literal">null</span> float64
+end_station_name           <span class="hljs-number">183215</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+end_station_latitude       <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> float64
+end_station_longitude      <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> float64
+bike_id                    <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> int64
+user_type                  <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+member_birth_year          <span class="hljs-number">175147</span> non-<span class="hljs-literal">null</span> float64
+member_gender              <span class="hljs-number">175147</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+bike_share_for_all_trip    <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+dtypes: float64(<span class="hljs-number">7</span>), int64(<span class="hljs-number">2</span>), <span class="hljs-class"><span class="hljs-keyword">object</span>(<span class="hljs-params">7</span>)</span>
+memory usage: <span class="hljs-number">22.4</span>+ <span class="hljs-type">MB</span>
+</code></pre><h3 id="what-is-the-structure-of-your-dataset-">What is the structure of your dataset?</h3>
+<p>There are 18,3412 records in this dataframe depicting usage data. Data collected includes duration of use, start and end locations of the bikes, and demographic information about the user. The rental check-outs all took place in the month of February 2019.</p>
+<h3 id="what-is-are-the-main-feature-s-of-interest-in-your-dataset-">What is/are the main feature(s) of interest in your dataset?</h3>
+<p>I want to know who is using the bikeshare program and when/under what circumstances.</p>
+<h3 id="what-features-in-the-dataset-do-you-think-will-help-support-your-investigation-into-your-feature-s-of-interest-">What features in the dataset do you think will help support your investigation into your feature(s) of interest?</h3>
+<p>Asking these questions of the data provided should be able to give me an idea of who is using the program and where:</p>
+<ul>
+<li>User demographics, such as gender identity and user type (customer/subscriber).</li>
+<li>Rental details, such as duration, day of the week, time of day.</li>
+</ul>
+<h2 id="quick-clean-of-the-data">Quick Clean of the Data</h2>
+<p>After a brief review of the data, I need to fix the data types for any data that is related to a date field. In this case, the &#39;start time&#39; and &#39;end time&#39; are all not classified as timestamps/dates. Rather, the &#39;start time&#39; and &#39;end time&#39; fields are string objects.</p>
+<pre><code class="lang-python">df_clean = df.copy()
+df_clean [<span class="hljs-string">'start_time'</span>] = pd.to_datetime(df[<span class="hljs-string">'start_time'</span>])
+df_clean [<span class="hljs-string">'end_time'</span>] = pd.to_datetime(df[<span class="hljs-string">'end_time'</span>])
+</code></pre>
+<pre><code class="lang-python"><span class="hljs-selector-tag">df_clean</span><span class="hljs-selector-class">.info</span>()
+</code></pre>
+<pre><code>&lt;<span class="hljs-class"><span class="hljs-keyword">class</span> '<span class="hljs-title">pandas</span>.<span class="hljs-title">core</span>.<span class="hljs-title">frame</span>.<span class="hljs-title">DataFrame</span>'<span class="hljs-title">&gt;</span></span>
+<span class="hljs-type">RangeIndex</span>: <span class="hljs-number">183412</span> entries, <span class="hljs-number">0</span> to <span class="hljs-number">183411</span>
+<span class="hljs-type">Data</span> columns (total <span class="hljs-number">16</span> columns):
+duration_sec               <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> int64
+start_time                 <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> datetime64[ns]
+end_time                   <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> datetime64[ns]
+start_station_id           <span class="hljs-number">183215</span> non-<span class="hljs-literal">null</span> float64
+start_station_name         <span class="hljs-number">183215</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+start_station_latitude     <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> float64
+start_station_longitude    <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> float64
+end_station_id             <span class="hljs-number">183215</span> non-<span class="hljs-literal">null</span> float64
+end_station_name           <span class="hljs-number">183215</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+end_station_latitude       <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> float64
+end_station_longitude      <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> float64
+bike_id                    <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> int64
+user_type                  <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+member_birth_year          <span class="hljs-number">175147</span> non-<span class="hljs-literal">null</span> float64
+member_gender              <span class="hljs-number">175147</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+bike_share_for_all_trip    <span class="hljs-number">183412</span> non-<span class="hljs-literal">null</span> <span class="hljs-class"><span class="hljs-keyword">object</span></span>
+dtypes: datetime64[ns](<span class="hljs-number">2</span>), float64(<span class="hljs-number">7</span>), int64(<span class="hljs-number">2</span>), <span class="hljs-class"><span class="hljs-keyword">object</span>(<span class="hljs-params">5</span>)</span>
+memory usage: <span class="hljs-number">22.4</span>+ <span class="hljs-type">MB</span>
+</code></pre><h2 id="univariate-exploration">Univariate Exploration</h2>
+<h3 id="user-profiles">User Profiles</h3>
+<p>Who are the people participating in the bikeshare program?</p>
+<ul>
+<li>Gender identity</li>
+<li>Subscriber vs Customer (User Type)</li>
+<li>Ages</li>
+</ul>
+<h3 id="rental-profile">Rental Profile</h3>
+<p>How and when are the bikes being used?</p>
+<ul>
+<li>Duration of rental</li>
+<li>Day of week of rental</li>
+<li>Time of day of rental</li>
+</ul>
+<pre><code class="lang-python"><span class="hljs-selector-id">#Day</span> of the week is categorical, so I need to set that up early on.
+df_clean[<span class="hljs-string">'day_of_rental'</span>] = df_clean[<span class="hljs-string">'start_time'</span>]<span class="hljs-selector-class">.dt</span><span class="hljs-selector-class">.day_name</span>()
+
+ordinal_var_dict = {<span class="hljs-string">'day_of_rental'</span>: [<span class="hljs-string">'Monday'</span>, <span class="hljs-string">'Tuesday'</span>, <span class="hljs-string">'Wednesday'</span>, <span class="hljs-string">'Thursday'</span>, <span class="hljs-string">'Friday'</span>, <span class="hljs-string">'Saturday'</span>, <span class="hljs-string">'Sunday'</span>]}
+
+<span class="hljs-keyword">for</span> <span class="hljs-selector-tag">var</span> <span class="hljs-keyword">in</span> ordinal_var_dict:
+    ordered_var = pd<span class="hljs-selector-class">.api</span><span class="hljs-selector-class">.types</span><span class="hljs-selector-class">.CategoricalDtype</span>(ordered = True,
+                                                categories = ordinal_var_dict[var])
+    df_clean[var] = df_clean[var].astype(ordered_var)
+</code></pre>
+<h2 id="user-profiles">User Profiles</h2>
+<h3 id="gender-identity">Gender Identity</h3>
+<pre><code class="lang-python">df<span class="hljs-number">_</span>clean[<span class="hljs-string">'member_gender'</span>].<span class="hljs-keyword">value</span><span class="hljs-number">_</span>counts()
+</code></pre>
+<pre><code><span class="hljs-type">Male</span>      <span class="hljs-number">130651</span>
+<span class="hljs-type">Female</span>     <span class="hljs-number">40844</span>
+<span class="hljs-type">Other</span>       <span class="hljs-number">3652</span>
+<span class="hljs-type">Name</span>: member_gender, d<span class="hljs-keyword">type</span>: int64
+</code></pre><pre><code class="lang-python"><span class="hljs-attr">sorted_counts</span> = df_clean['member_gender'].value_counts()
+<span class="hljs-attr">null_gender</span> = df_clean['member_gender'].value_counts().sum()
+<span class="hljs-attr">max_type_count</span> = sorted_counts[<span class="hljs-number">0</span>]
+<span class="hljs-attr">max_prop</span> = max_type_count/null_gender
+
+plt.pie(sorted_counts, <span class="hljs-attr">labels</span> = sorted_counts.index, <span class="hljs-attr">autopct='%1.2f%%',</span> <span class="hljs-attr">startangle</span> = <span class="hljs-number">90</span>, <span class="hljs-attr">counterclock</span> = False);
+plt.legend(sorted_counts.index, <span class="hljs-attr">loc="best")</span>
+plt.title(<span class="hljs-string">"Proportion of Rentals by Gender Identity"</span>, <span class="hljs-attr">fontsize</span> = <span class="hljs-number">15</span>)
+plt.axis('square');
+</code></pre>
+<p><img src="output_13_0.png" alt="png"></p>
+<blockquote>
+<p>There are clearly more users identifying as male than any other gender identity.</p>
+</blockquote>
+<h3 id="user-type">User Type</h3>
+<pre><code class="lang-python">type_counts = df_clean[<span class="hljs-string">'user_type'</span>].value_counts()
+type_order = type_counts.index
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+
+
+null_users = df_clean[<span class="hljs-string">'user_type'</span>].value_counts().sum()
+max_type_count = type_counts[<span class="hljs-number">0</span>]
+max_prop = max_type_count/null_users
+tick_props = np.arange(<span class="hljs-number">0</span>, max_prop+<span class="hljs-number">0.2</span>, <span class="hljs-number">0.2</span>)
+tick_names = [<span class="hljs-string">'{:0.2f}'</span>.<span class="hljs-built_in">format</span>(v) <span class="hljs-keyword">for</span> v <span class="hljs-built_in">in</span> tick_props]
+
+
+sb.countplot(data = df_clean, y = <span class="hljs-string">'user_type'</span>, color = base_color, order = type_order);
+plt.xticks(tick_props * null_users, tick_names)
+plt.xlabel(<span class="hljs-string">'Proportion'</span>)
+plt.ylabel(<span class="hljs-string">'User Type'</span>)
+plt.title(<span class="hljs-string">'Proportion of Rentals by User Type'</span>, fontsize = <span class="hljs-number">20</span>);
+
+<span class="hljs-keyword">for</span> i <span class="hljs-built_in">in</span> range (type_counts.shape[<span class="hljs-number">0</span>]):
+    <span class="hljs-built_in">count</span> = type_counts[i]
+    pct_string = <span class="hljs-string">'{:0.1f}%'</span>.<span class="hljs-built_in">format</span>(<span class="hljs-number">100</span>*<span class="hljs-built_in">count</span>/null_users)
+    plt.<span class="hljs-built_in">text</span>(<span class="hljs-built_in">count</span>+<span class="hljs-number">1</span>, i, pct_string, va=<span class="hljs-string">'center'</span>)
+</code></pre>
+<p><img src="output_16_0.png" alt="png"></p>
+<blockquote>
+<p>Users are overwhelmingly Subscribers</p>
+</blockquote>
+<h3 id="ages">Ages</h3>
+<pre><code class="lang-python">#This <span class="hljs-keyword">is</span> tricky because there are some obviously wrong ages here due <span class="hljs-keyword">to</span> likely typos <span class="hljs-keyword">in</span> the birth year column.
+#<span class="hljs-keyword">while</span> there certainly may be older patrons, I think it <span class="hljs-keyword">is</span> safe <span class="hljs-keyword">to</span> <span class="hljs-keyword">not</span> include anyone older than <span class="hljs-number">80</span> (<span class="hljs-number">1939</span> <span class="hljs-keyword">in</span> <span class="hljs-number">2019</span>),
+# but they should <span class="hljs-keyword">not</span> be included <span class="hljs-keyword">in</span> the calculations.
+too_old = df_clean.query(<span class="hljs-string">'member_birth_year &lt; 1939'</span>)
+too_old[<span class="hljs-string">'member_birth_year'</span>].count()
+</code></pre>
+<pre><code><span class="hljs-number">192</span>
+</code></pre><pre><code class="lang-python"><span class="hljs-symbol">THRESHOLD</span> = <span class="hljs-number">1939</span>
+year_frequency = df_clean[<span class="hljs-string">'member_birth_year'</span>].value_counts()
+idx = np.sum(year_frequency &gt; <span class="hljs-symbol">THRESHOLD</span>)
+most_years = year_frequency.index[:idx]
+member_year_sub = df_clean.loc[df_clean[<span class="hljs-string">'member_birth_year'</span>].isin(most_years)]
+year_means = member_year_sub.groupby(<span class="hljs-string">'member_birth_year'</span>).mean()
+plt.hist(data = member_year_sub, x = <span class="hljs-string">'member_birth_year'</span>);
+plt.xlabel(<span class="hljs-string">'Birth Years'</span>);
+plt.ylabel(<span class="hljs-string">'Count of Rentals'</span>);
+plt.title(<span class="hljs-string">'Count of Rentals by Birth Year'</span>, fontsize = <span class="hljs-number">15</span>);
+</code></pre>
+<p><img src="output_20_0.png" alt="png"></p>
+<blockquote>
+<p>Users skew younger, between 20-40 years of age.</p>
+</blockquote>
+<h2 id="rental-profiles">Rental Profiles</h2>
+<h3 id="what-is-the-duration-of-each-rental-">What is the duration of each rental?</h3>
+<pre><code class="lang-python">#average duration <span class="hljs-keyword">of</span> booking <span class="hljs-keyword">in</span> minutes
+duration_mean = df_clean[<span class="hljs-string">'duration_sec'</span>].mean()
+duration_mean/<span class="hljs-number">60</span>
+</code></pre>
+<pre><code>12<span class="hljs-selector-class">.101307257249617</span>
+</code></pre><pre><code class="lang-python">#What <span class="hljs-keyword">is</span> the spread <span class="hljs-keyword">of</span> the rental duration <span class="hljs-keyword">in</span> minutes?
+rental_minutes = df_clean[<span class="hljs-symbol">'duration_sec</span>']/<span class="hljs-number">60</span>
+plt.hist(data = df_clean, x = rental_minutes);
+plt.xlabel(<span class="hljs-symbol">'Duration</span> <span class="hljs-keyword">of</span> Rental <span class="hljs-keyword">in</span> Minutes');
+plt.ylabel(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> Rentals');
+plt.title(<span class="hljs-symbol">'Spread</span> <span class="hljs-keyword">of</span> Rental Duration', fontsize = <span class="hljs-number">20</span>);
+</code></pre>
+<p><img src="output_25_0.png" alt="png"></p>
+<pre><code class="lang-python"><span class="hljs-selector-id">#taking</span> <span class="hljs-selector-tag">a</span> closer look
+np.log10(rental_minutes.describe())
+</code></pre>
+<pre><code><span class="hljs-selector-tag">count</span>    5<span class="hljs-selector-class">.263428</span>
+<span class="hljs-selector-tag">mean</span>     1<span class="hljs-selector-class">.082832</span>
+<span class="hljs-selector-tag">std</span>      1<span class="hljs-selector-class">.475766</span>
+<span class="hljs-selector-tag">min</span>      0<span class="hljs-selector-class">.007179</span>
+25%      0<span class="hljs-selector-class">.733732</span>
+50%      0<span class="hljs-selector-class">.932812</span>
+75%      1<span class="hljs-selector-class">.122762</span>
+<span class="hljs-selector-tag">max</span>      3<span class="hljs-selector-class">.153530</span>
+<span class="hljs-selector-tag">Name</span>: <span class="hljs-selector-tag">duration_sec</span>, <span class="hljs-selector-tag">dtype</span>: <span class="hljs-selector-tag">float64</span>
+</code></pre><pre><code class="lang-python">bins = <span class="hljs-number">10</span> ** np.arange(<span class="hljs-number">0.007</span>, <span class="hljs-number">3.153</span>+<span class="hljs-number">0.1</span>, <span class="hljs-number">0.1</span>)
+
+plt.figure(figsize=[<span class="hljs-number">10</span>, <span class="hljs-number">7</span>])
+plt.hist(data = df_clean, x = rental_minutes, bins = bins);
+plt.xscale('log');
+plt.xticks([<span class="hljs-number">0.1</span>, <span class="hljs-number">0.3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">30</span>, <span class="hljs-number">100</span>, <span class="hljs-number">300</span>, <span class="hljs-number">1000</span>], ['<span class="hljs-number">6</span> Seconds', '<span class="hljs-number">20</span> Seconds', '<span class="hljs-number">1</span> Minute', '<span class="hljs-number">3</span> Minutes', 
+                                                   '<span class="hljs-number">10</span> Minutes', '<span class="hljs-number">30</span> Minutes', '<span class="hljs-number">100</span> Minutes', 
+                                                   '<span class="hljs-number">300</span> Minutes', '<span class="hljs-number">1000</span> Minutes']);
+plt.xlabel('Duration of Rentals in Minutes');
+plt.xticks(<span class="hljs-type">rotation</span> = <span class="hljs-number">20</span>)
+plt.ylabel('Count of Rentals');
+plt.title('Spread of Rental Duration in Log Minutes', fontsize = <span class="hljs-number">20</span>);
+</code></pre>
+<p><img src="output_27_0.png" alt="png"></p>
+<blockquote>
+<p>It looks like most rentals are between 1 minute and 30 minutes in length, with a possible mean of about 10 minutes.</p>
+</blockquote>
+<h3 id="what-is-the-breakdown-of-rentals-across-each-day-of-the-week-day-of-week-">What is the breakdown of rentals across each day of the week? (Day of Week)</h3>
+<pre><code class="lang-python">base_color = sb.color_palette<span class="hljs-literal">()</span>[<span class="hljs-number">0</span>]
+day_order = [<span class="hljs-symbol">'Monday'</span>, <span class="hljs-symbol">'Tuesday'</span>, <span class="hljs-symbol">'Wednesday'</span>, <span class="hljs-symbol">'Thursday'</span>, <span class="hljs-symbol">'Friday'</span>, <span class="hljs-symbol">'Saturday'</span>, <span class="hljs-symbol">'Sunday'</span>]
+sb.countplot(data = df_clean, y = <span class="hljs-symbol">'day_of_rental'</span>, color = base_color, <span class="hljs-built_in">order</span> = day_order);
+plt.xlabel(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> <span class="hljs-type">Rentals'</span>);
+plt.ylabel(<span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> <span class="hljs-type">Rental'</span>);
+plt.title(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> <span class="hljs-type">Rentals</span> by <span class="hljs-type">Day</span> <span class="hljs-keyword">of</span> <span class="hljs-type">Week'</span>, fontsize = <span class="hljs-number">18</span>);
+</code></pre>
+<p><img src="output_30_0.png" alt="png"></p>
+<blockquote>
+<p>The bikes look like they are most often used during the work-week.</p>
+</blockquote>
+<h3 id="what-is-the-breakdown-of-rentals-across-each-day-time-of-day-">What is the breakdown of rentals across each day? (Time of Day)</h3>
+<pre><code class="lang-python">df_clean[<span class="hljs-string">'start_time'</span>]<span class="hljs-selector-class">.dt</span><span class="hljs-selector-class">.hour</span><span class="hljs-selector-class">.value_counts</span>()
+</code></pre>
+<pre><code><span class="hljs-number">17</span>    <span class="hljs-number">21864</span>
+<span class="hljs-number">8</span>     <span class="hljs-number">21056</span>
+<span class="hljs-number">18</span>    <span class="hljs-number">16827</span>
+<span class="hljs-number">9</span>     <span class="hljs-number">15903</span>
+<span class="hljs-number">16</span>    <span class="hljs-number">14169</span>
+<span class="hljs-number">7</span>     <span class="hljs-number">10614</span>
+<span class="hljs-number">19</span>     <span class="hljs-number">9881</span>
+<span class="hljs-number">15</span>     <span class="hljs-number">9174</span>
+<span class="hljs-number">12</span>     <span class="hljs-number">8724</span>
+<span class="hljs-number">13</span>     <span class="hljs-number">8551</span>
+<span class="hljs-number">10</span>     <span class="hljs-number">8364</span>
+<span class="hljs-number">14</span>     <span class="hljs-number">8152</span>
+<span class="hljs-number">11</span>     <span class="hljs-number">7884</span>
+<span class="hljs-number">20</span>     <span class="hljs-number">6482</span>
+<span class="hljs-number">21</span>     <span class="hljs-number">4561</span>
+<span class="hljs-number">6</span>      <span class="hljs-number">3485</span>
+<span class="hljs-number">22</span>     <span class="hljs-number">2916</span>
+<span class="hljs-number">23</span>     <span class="hljs-number">1646</span>
+<span class="hljs-number">0</span>       <span class="hljs-number">925</span>
+<span class="hljs-number">5</span>       <span class="hljs-number">896</span>
+<span class="hljs-number">1</span>       <span class="hljs-number">548</span>
+<span class="hljs-number">2</span>       <span class="hljs-number">381</span>
+<span class="hljs-number">4</span>       <span class="hljs-number">235</span>
+<span class="hljs-number">3</span>       <span class="hljs-number">174</span>
+<span class="hljs-type">Name</span>: start_time, d<span class="hljs-keyword">type</span>: int64
+</code></pre><pre><code class="lang-python"><span class="hljs-selector-id">#I</span> will be using this variable again <span class="hljs-keyword">in</span> the future, so I am making it <span class="hljs-selector-tag">a</span> column <span class="hljs-keyword">in</span> the <span class="hljs-selector-tag">table</span>
+df_clean[<span class="hljs-string">'rental_hour'</span>] = df_clean[<span class="hljs-string">'start_time'</span>]<span class="hljs-selector-class">.dt</span><span class="hljs-selector-class">.hour</span>
+</code></pre>
+<pre><code class="lang-python">#I am simplifying the rental time into hour blocks
+hour_counts = df_clean['rental_hour']
+bins = np.arange(<span class="hljs-number">0</span>, hour_counts.max()+<span class="hljs-number">2</span>, <span class="hljs-number">2</span>)
+
+plt.figure(figsize=[<span class="hljs-number">10</span>, <span class="hljs-number">7</span>])
+plt.hist(data = df_clean, x = hour_counts, bins = bins);
+plt.xticks([<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>,<span class="hljs-number">10</span>,<span class="hljs-number">11</span>,<span class="hljs-number">12</span>,<span class="hljs-number">13</span>,<span class="hljs-number">14</span>,<span class="hljs-number">15</span>,
+            <span class="hljs-number">16</span>,<span class="hljs-number">17</span>,<span class="hljs-number">18</span>,<span class="hljs-number">19</span>,<span class="hljs-number">20</span>,<span class="hljs-number">21</span>,<span class="hljs-number">22</span>,<span class="hljs-number">23</span>], ['Midnight', '<span class="hljs-number">1</span>am', '<span class="hljs-number">2</span>am', '<span class="hljs-number">3</span>am', '<span class="hljs-number">4</span>am', '<span class="hljs-number">5</span>am','<span class="hljs-number">6</span>am', '<span class="hljs-number">7</span>am',
+                                       '<span class="hljs-number">8</span>am', '<span class="hljs-number">9</span>am','<span class="hljs-number">10</span>am', '<span class="hljs-number">11</span>am','Noon', '<span class="hljs-number">1</span>pm','<span class="hljs-number">2</span>pm', '<span class="hljs-number">3</span>pm',
+                                       '<span class="hljs-number">4</span>pm', '<span class="hljs-number">5</span>pm', '<span class="hljs-number">6</span>pm', '<span class="hljs-number">7</span>pm', '<span class="hljs-number">8</span>pm', '<span class="hljs-number">9</span>pm', '<span class="hljs-number">10</span>pm', '<span class="hljs-number">11</span>pm']);
+plt.xticks(<span class="hljs-type">rotation</span> = <span class="hljs-number">45</span>);
+plt.ylabel('Count of Rentals');
+plt.xlabel('Hour of the Day');
+plt.title('Count of Rentals Throughout the Day', fontsize = <span class="hljs-number">20</span>);
+</code></pre>
+<p><img src="output_35_0.png" alt="png"></p>
+<blockquote>
+<p>Rentals follow the bimodal shape of rush hour traffic, which makes sense considering the bikes are more often used during the work week.</p>
+</blockquote>
+<h3 id="discuss-the-distribution-s-of-your-variable-s-of-interest-were-there-any-unusual-points-did-you-need-to-perform-any-transformations-">Discuss the distribution(s) of your variable(s) of interest. Were there any unusual points? Did you need to perform any transformations?</h3>
+<ul>
+<li><p>I am surprised by the breakdown of gender identity; while not ever rental had this demographic information, I was not expecting such a large proportion of men over women.</p>
+</li>
+<li><p>It was not surprising that the proportion of subscribers is significantly higher than casual users; I imagine that any company would want to have more subscribers.</p>
+</li>
+<li><p>The member ages was a tricky variable. Not every rental had this demographic information and over 100 of the rentals clearly had something wrong with the birth year (e.g., 1900). But, what is not surprising is that the data skews toward younger users. Biking is a physical activity and likely a strenuous one in a city such as San Francisco.</p>
+</li>
+<li><p>Rental duration was a variable that needed a closer look. Most rentals are under 30 minutes in length.</p>
+</li>
+<li><p>Rentals appear to take place more often during the week than on the weekend, which was a bit surprising to me. I would assume that, in a large city, bike usage would be somewhat uniform across the week.</p>
+</li>
+<li><p>The rental time of day makes sense when also thinking about the days of the week; If people are renting the bikes during the week to go to work, the bimodal visualization showing peaks in the morning and late afternoon line up with common rush hour traffic times. </p>
+</li>
+</ul>
+<h3 id="of-the-features-you-investigated-were-there-any-unusual-distributions-did-you-perform-any-operations-on-the-data-to-tidy-adjust-or-change-the-form-of-the-data-if-so-why-did-you-do-this-">Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?</h3>
+<ul>
+<li>There were outliers associated with rental duration that made the initial visualization difficult to interpret. Knowing that the mean duration of rental was about 12 minutes, I knew there must be some kind of outlier(s) affecting the visual. By introducing a log transformation, I was able to zoom in on the data. </li>
+</ul>
+<h2 id="bivariate-exploration">Bivariate Exploration</h2>
+<h3 id="user-types-and-day-of-the-week-rentals">User Types and Day of the Week Rentals</h3>
+<pre><code class="lang-python">df_clean.groupby([<span class="hljs-string">'day_of_rental'</span>, <span class="hljs-string">'user_type'</span>], as_index=<span class="hljs-keyword">False</span>)[<span class="hljs-string">'start_time'</span>].<span class="hljs-keyword">count</span>()
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>day_of_rental</th>
+      <th>user_type</th>
+      <th>start_time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Monday</td>
+      <td>Customer</td>
+      <td>2741</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Monday</td>
+      <td>Subscriber</td>
+      <td>24111</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Tuesday</td>
+      <td>Customer</td>
+      <td>2606</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Tuesday</td>
+      <td>Subscriber</td>
+      <td>29207</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Wednesday</td>
+      <td>Customer</td>
+      <td>2466</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Wednesday</td>
+      <td>Subscriber</td>
+      <td>27175</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Thursday</td>
+      <td>Customer</td>
+      <td>3390</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Thursday</td>
+      <td>Subscriber</td>
+      <td>31807</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Friday</td>
+      <td>Customer</td>
+      <td>3030</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Friday</td>
+      <td>Subscriber</td>
+      <td>25951</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Saturday</td>
+      <td>Customer</td>
+      <td>2739</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Saturday</td>
+      <td>Subscriber</td>
+      <td>12666</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Sunday</td>
+      <td>Customer</td>
+      <td>2896</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Sunday</td>
+      <td>Subscriber</td>
+      <td>12627</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+<pre><code class="lang-python">#Looks like the rate <span class="hljs-keyword">of</span> <span class="hljs-keyword">use</span> <span class="hljs-keyword">is</span> similar between the two types <span class="hljs-keyword">of</span> customers
+ax = sb.countplot(data = df_clean, x = <span class="hljs-symbol">'day_of_rental</span>', hue = <span class="hljs-symbol">'user_type</span>', palette = <span class="hljs-symbol">'Blues</span>');
+ax.legend(loc = <span class="hljs-number">1</span>, framealpha = <span class="hljs-number">1</span>)
+plt.xlabel(<span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> the Week');
+plt.ylabel(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> Rentals');
+plt.title(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> Rentals by Day <span class="hljs-keyword">of</span> the Week', fontsize = <span class="hljs-number">15</span>)
+plt.xticks(rotation = <span class="hljs-number">20</span>);
+</code></pre>
+<p><img src="output_41_0.png" alt="png"></p>
+<pre><code class="lang-python">#since the sheer number <span class="hljs-keyword">of</span> rentals by subscribers <span class="hljs-keyword">is</span> so much more than customers,
+#I want <span class="hljs-keyword">to</span> zoom <span class="hljs-keyword">in</span> a <span class="hljs-built_in">bit</span> <span class="hljs-keyword">to</span> see <span class="hljs-keyword">if</span> there <span class="hljs-keyword">is</span> a difference <span class="hljs-keyword">in</span> <span class="hljs-keyword">use</span> patterns
+fig, ax = plt.subplots(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, sharey = <span class="hljs-literal">True</span>, figsize=(<span class="hljs-number">10</span>, <span class="hljs-number">5</span>))
+
+# Customer <span class="hljs-keyword">use</span> over the span <span class="hljs-keyword">of</span> a week
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>) 
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+day_order = [<span class="hljs-symbol">'Monday</span>', <span class="hljs-symbol">'Tuesday</span>', <span class="hljs-symbol">'Wednesday</span>', <span class="hljs-symbol">'Thursday</span>', <span class="hljs-symbol">'Friday</span>', <span class="hljs-symbol">'Saturday</span>', <span class="hljs-symbol">'Sunday</span>']
+ax = sb.countplot(data = df_clean.query(<span class="hljs-symbol">'user_type</span> == <span class="hljs-string">"Customer"</span>'), x = <span class="hljs-symbol">'day_of_rental</span>', 
+                  color = base_color, order = day_order);
+ax.legend(loc = <span class="hljs-number">1</span>, framealpha = <span class="hljs-number">1</span>)
+plt.xlabel(<span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> the Week');
+plt.ylabel(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> Rentals');
+plt.title(<span class="hljs-symbol">'Customer</span> <span class="hljs-keyword">Use</span>', fontsize = <span class="hljs-number">15</span>);
+plt.xticks(rotation = <span class="hljs-number">45</span>);
+
+# Subscriber <span class="hljs-keyword">use</span> over the span <span class="hljs-keyword">of</span> a week
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>)
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+day_order = [<span class="hljs-symbol">'Monday</span>', <span class="hljs-symbol">'Tuesday</span>', <span class="hljs-symbol">'Wednesday</span>', <span class="hljs-symbol">'Thursday</span>', <span class="hljs-symbol">'Friday</span>', <span class="hljs-symbol">'Saturday</span>', <span class="hljs-symbol">'Sunday</span>']
+ax = sb.countplot(data = df_clean.query(<span class="hljs-symbol">'user_type</span> == <span class="hljs-string">"Subscriber"</span>'), x = <span class="hljs-symbol">'day_of_rental</span>', 
+                  color = base_color, order = day_order);
+ax.legend(loc = <span class="hljs-number">1</span>, framealpha = <span class="hljs-number">1</span>)
+plt.xlabel(<span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> the Week');
+plt.ylabel(<span class="hljs-string">" "</span>);
+plt.title(<span class="hljs-symbol">'Subscriber</span> <span class="hljs-keyword">Use</span>', fontsize = <span class="hljs-number">15</span>);
+plt.xticks(rotation = <span class="hljs-number">45</span>);
+
+fig.tight_layout()
+</code></pre>
+<p><img src="output_42_0.png" alt="png"></p>
+<blockquote>
+<p>It is much more obvious in the above visualization that there is a difference in how Customers use the bikes compared to Subscribers. Customers are using the bikes fairly consistently throughout the week while Subscribers are clearly using the bikes during the week more than on weekends.</p>
+</blockquote>
+<h3 id="user-type-and-rental-duration">User Type and Rental Duration</h3>
+<pre><code class="lang-python"><span class="hljs-comment">#Since I will be using this calculation again, I will make it a column</span>
+df_clean[<span class="hljs-string">'rental_minutes'</span>] = df_clean[<span class="hljs-string">'duration_sec'</span>]<span class="hljs-regexp">/60</span>
+</code></pre>
+<pre><code class="lang-python"><span class="hljs-comment">#these violin plots are clearly being influenced by some big outliers</span>
+<span class="hljs-keyword">base_color </span>= <span class="hljs-keyword">sb.color_palette()[0]
+</span><span class="hljs-keyword">sb.set(rc={"figure.figsize":(8, </span><span class="hljs-number">8</span>)})
+<span class="hljs-keyword">sb.violinplot(data </span>= df_clean, x = <span class="hljs-string">'user_type'</span>, y = <span class="hljs-string">'rental_minutes'</span>,
+                  color = <span class="hljs-keyword">base_color);
+</span>plt.ylabel(<span class="hljs-string">'Rental Minute Length'</span>)<span class="hljs-comment">;</span>
+plt.xlabel(<span class="hljs-string">'User Typer'</span>)<span class="hljs-comment">;</span>
+plt.title(<span class="hljs-string">'Duration of Rental by User Type'</span>, fontsize = <span class="hljs-number">20</span>)<span class="hljs-comment">;</span>
+</code></pre>
+<p><img src="output_46_0.png" alt="png"></p>
+<pre><code class="lang-python"><span class="hljs-comment">#Since the mean rental time is 12 minutes and looking at the visualization from earlier, </span>
+<span class="hljs-comment">#I am going to see what our outliers look like for rentals over 50 minutes</span>
+<span class="hljs-attr">outlier_minutes</span> = (df_clean[<span class="hljs-string">'rental_minutes'</span>] &gt; <span class="hljs-number">50</span>)
+<span class="hljs-comment">#print(outlier_minutes.sum())</span>
+<span class="hljs-comment">#print(df_clean.loc[outlier_minutes, :])</span>
+</code></pre>
+<pre><code class="lang-python"><span class="hljs-selector-id">#remove</span> those outliers
+df_clean = df_clean<span class="hljs-selector-class">.loc</span>[-outlier_minutes, :]
+</code></pre>
+<pre><code class="lang-python"><span class="hljs-comment">#re-plot the data</span>
+<span class="hljs-keyword">base_color </span>= <span class="hljs-keyword">sb.color_palette()[0]
+</span><span class="hljs-keyword">sb.set(rc={"figure.figsize":(8, </span><span class="hljs-number">8</span>)})
+<span class="hljs-keyword">sb.violinplot(data </span>= df_clean, x = <span class="hljs-string">'user_type'</span>, y = <span class="hljs-string">'rental_minutes'</span>,
+                  color = <span class="hljs-keyword">base_color);
+</span>plt.ylabel(<span class="hljs-string">'Rental Minute Length'</span>)<span class="hljs-comment">;</span>
+plt.xlabel(<span class="hljs-string">'User Typer'</span>)<span class="hljs-comment">;</span>
+plt.title(<span class="hljs-string">'Duration of Rental by User Type'</span>, fontsize = <span class="hljs-number">20</span>)<span class="hljs-comment">;</span>
+</code></pre>
+<p><img src="output_49_0.png" alt="png"></p>
+<pre><code class="lang-python"><span class="hljs-comment">#I want to transform this now because I am going to be using this variable a bit more</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">log_trans</span><span class="hljs-params">(x, inverse = False)</span>:</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> inverse:
+        <span class="hljs-keyword">return</span> np.log10(x)
+    <span class="hljs-keyword">else</span>:
+        <span class="hljs-keyword">return</span> np.power(<span class="hljs-number">10</span>, x)
+
+df_clean[<span class="hljs-string">'log_duration'</span>] = df_clean[<span class="hljs-string">'rental_minutes'</span>].apply(log_trans)
+</code></pre>
+<pre><code class="lang-python">base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+sb.set(rc={<span class="hljs-string">"figure.figsize"</span>:(<span class="hljs-number">8</span>, <span class="hljs-number">8</span>)})
+
+ax = sb.violinplot(data = df_clean, x = <span class="hljs-string">'user_type'</span>, y = <span class="hljs-string">'log_duration'</span>, color = base_color, showmeans = <span class="hljs-symbol">True</span>)
+
+ax.set_yticks(log_trans(np.array([<span class="hljs-number">0.1</span>, <span class="hljs-number">0.3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">30</span>, <span class="hljs-number">100</span>, <span class="hljs-number">300</span>])))
+ax.set_yticklabels([<span class="hljs-string">'6 Seconds'</span>, <span class="hljs-string">'20 Seconds'</span>, <span class="hljs-string">'1 Minute'</span>, <span class="hljs-string">'3 Minutes'</span>, 
+                                                   <span class="hljs-string">'10 Minutes'</span>, <span class="hljs-string">'30 Minutes'</span>, <span class="hljs-string">'100 Minutes'</span>, 
+                                                   <span class="hljs-string">'300 Minutes'</span>])
+plt.ylabel(<span class="hljs-string">'Rental Minute Length (Log Minutes)'</span>);
+plt.xlabel(<span class="hljs-string">'User Typer'</span>);
+plt.title(<span class="hljs-string">'Duration of Rental by User Type'</span>, fontsize = <span class="hljs-number">20</span>);
+</code></pre>
+<p><img src="output_51_0.png" alt="png"></p>
+<blockquote>
+<p>Looks like Subscribers like to use the bikes for quick purposes more than Customers.</p>
+</blockquote>
+<h3 id="day-of-the-week-and-rental-duration">Day of the Week and Rental Duration</h3>
+<pre><code class="lang-python"><span class="hljs-selector-tag">df_clean</span><span class="hljs-selector-attr">['rental_minutes']</span><span class="hljs-selector-class">.describe</span>()
+</code></pre>
+<pre><code><span class="hljs-selector-tag">count</span>    181090<span class="hljs-selector-class">.000000</span>
+<span class="hljs-selector-tag">mean</span>         10<span class="hljs-selector-class">.245153</span>
+<span class="hljs-selector-tag">std</span>           7<span class="hljs-selector-class">.043332</span>
+<span class="hljs-selector-tag">min</span>           1<span class="hljs-selector-class">.016667</span>
+25%           5<span class="hljs-selector-class">.383333</span>
+50%           8<span class="hljs-selector-class">.483333</span>
+75%          13<span class="hljs-selector-class">.016667</span>
+<span class="hljs-selector-tag">max</span>          50<span class="hljs-selector-class">.000000</span>
+<span class="hljs-selector-tag">Name</span>: <span class="hljs-selector-tag">rental_minutes</span>, <span class="hljs-selector-tag">dtype</span>: <span class="hljs-selector-tag">float64</span>
+</code></pre><pre><code class="lang-python"><span class="hljs-comment">#This boxplot really demonstrates how many outliers still exist over 30 minutes</span>
+<span class="hljs-keyword">base_color </span>= <span class="hljs-keyword">sb.color_palette()[0]
+</span><span class="hljs-keyword">sb.boxplot(data </span>= df_clean, x=<span class="hljs-string">'day_of_rental'</span>, y=<span class="hljs-string">'rental_minutes'</span>, color=<span class="hljs-keyword">base_color, </span><span class="hljs-keyword">showmeans </span>= True)<span class="hljs-comment">;</span>
+plt.xlabel(<span class="hljs-string">'Day of the Week'</span>)<span class="hljs-comment">;</span>
+plt.ylabel(<span class="hljs-string">'Rental Duration in Minutes'</span>)<span class="hljs-comment">;</span>
+plt.title(<span class="hljs-string">'Rental Duration by Day of Week'</span>, fontsize = <span class="hljs-number">20</span>)<span class="hljs-comment">;</span>
+</code></pre>
+<p><img src="output_55_0.png" alt="png"></p>
+<pre><code class="lang-python">#transform and zoom in more
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+ax = sb.boxplot(data = df_clean, x='day_of_rental', y='log_duration', color=base_color, showmeans = True);
+ax.set_yticks(log_trans(np.array([<span class="hljs-number">0.1</span>, <span class="hljs-number">0.3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">30</span>, <span class="hljs-number">100</span>, <span class="hljs-number">300</span>])))
+ax.set_yticklabels(['<span class="hljs-number">6</span> Seconds', '<span class="hljs-number">20</span> Seconds', '<span class="hljs-number">1</span> Minute', '<span class="hljs-number">3</span> Minutes', 
+                                                   '<span class="hljs-number">10</span> Minutes', '<span class="hljs-number">30</span> Minutes', '<span class="hljs-number">100</span> Minutes', 
+                                                   '<span class="hljs-number">300</span> Minutes'])
+plt.xlabel('Day of the Week');
+plt.ylabel('Rental Duration (Log Minutes)');
+plt.title('Rental Duration by Day of Week (Log)', fontsize = <span class="hljs-number">20</span>);
+</code></pre>
+<p><img src="output_56_0.png" alt="png"></p>
+<p>This visual demonstrates how use during the week is quite consistent, but there is some spread on the weekends. Likely influenced by the different types of users (Customers vs. Subscribers).</p>
+<h3 id="gender-identity-and-age">Gender Identity and Age</h3>
+<pre><code class="lang-python"><span class="hljs-comment">#Adding a column that has the calculated age of each person</span>
+df_clean[<span class="hljs-string">'age'</span>] = <span class="hljs-number">2019</span> - df_clean[<span class="hljs-string">'member_birth_year'</span>]
+</code></pre>
+<pre><code class="lang-python">#Convert the age <span class="hljs-built_in">data</span> <span class="hljs-keyword">type</span> from float <span class="hljs-keyword">to</span> <span class="hljs-built_in">integer</span>
+df_clean<span class="hljs-meta">[</span><span class="hljs-string">'age'</span><span class="hljs-meta">]</span> = df_clean<span class="hljs-meta">[</span><span class="hljs-string">'age'</span><span class="hljs-meta">]</span>.fillna(0)
+df_clean<span class="hljs-meta">[</span><span class="hljs-string">'age'</span><span class="hljs-meta">]</span> = df_clean<span class="hljs-meta">[</span><span class="hljs-string">'age'</span><span class="hljs-meta">]</span>.astype(int)
+</code></pre>
+<pre><code class="lang-python">#Sticking with my threshold of <span class="hljs-number">1939</span> I need to remove those ages that are outliers
+outlier_age = (<span class="hljs-name">df_clean</span>['age'] &gt; <span class="hljs-number">80</span>)
+#print(<span class="hljs-name">outlier_age</span>.sum())
+#print(<span class="hljs-name">df_clean</span>.loc[outlier_age, :])
+</code></pre>
+<pre><code class="lang-python">no_age = (<span class="hljs-name">df_clean</span>['age'] == <span class="hljs-number">0</span>)
+#print(<span class="hljs-name">no_age</span>.sum())
+#print(<span class="hljs-name">df_clean</span>.loc[no_age, :])
+</code></pre>
+<pre><code class="lang-python"><span class="hljs-selector-id">#remove</span> those outliers
+df_clean = df_clean<span class="hljs-selector-class">.loc</span>[-outlier_age &amp; -no_age, :]
+</code></pre>
+<pre><code class="lang-python"><span class="hljs-comment">#Build the plot. I am also indicating the mean on the boxplots with the red triangle.</span>
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+orders = df_clean[<span class="hljs-string">'member_gender'</span>].value_counts().index
+sb.boxplot(data = df_clean, x=<span class="hljs-string">'member_gender'</span>, y=<span class="hljs-string">'age'</span>, order = orders, color=base_color, showmeans = <span class="hljs-keyword">True</span>);
+plt.xlabel(<span class="hljs-string">'User Gender Identity'</span>);
+plt.ylabel(<span class="hljs-string">'Age'</span>);
+plt.title(<span class="hljs-string">'User Gender Identity and Age'</span>, fontsize = <span class="hljs-number">20</span>);
+
+median_age = df_clean.groupby(<span class="hljs-string">'member_gender'</span>)[<span class="hljs-string">'age'</span>].median()
+mean_age = df_clean.groupby(<span class="hljs-string">'member_gender'</span>)[<span class="hljs-string">'age'</span>].mean()
+<span class="hljs-keyword">print</span>(median_age)
+<span class="hljs-keyword">print</span>(mean_age)
+</code></pre>
+<pre><code><span class="hljs-title">member_gender</span>
+<span class="hljs-type">Female</span>    <span class="hljs-number">31</span>
+<span class="hljs-type">Male</span>      <span class="hljs-number">32</span>
+<span class="hljs-type">Other</span>     <span class="hljs-number">34</span>
+<span class="hljs-type">Name</span>: age, d<span class="hljs-keyword">type</span>: int64
+<span class="hljs-title">member_gender</span>
+<span class="hljs-type">Female</span>    <span class="hljs-number">33.165043</span>
+<span class="hljs-type">Male</span>      <span class="hljs-number">34.366279</span>
+<span class="hljs-type">Other</span>     <span class="hljs-number">35.707875</span>
+<span class="hljs-type">Name</span>: age, d<span class="hljs-keyword">type</span>: float64
+</code></pre><p><img src="output_64_1.png" alt="png"></p>
+<blockquote>
+<p>While the mean and median ages of each group is quite similar, this boxplot shows how the female-identifying group is generally younger.</p>
+</blockquote>
+<h3 id="gender-identity-and-duration-of-use">Gender Identity and Duration of Use</h3>
+<pre><code class="lang-python">#I want <span class="hljs-keyword">to</span> check my means here first
+gender_rentals = df_clean.groupby(<span class="hljs-string">'member_gender'</span>)<span class="hljs-meta">[</span><span class="hljs-string">'rental_minutes'</span><span class="hljs-meta">]</span>.mean()
+gender_rentals
+</code></pre>
+<pre><code><span class="hljs-selector-tag">member_gender</span>
+<span class="hljs-selector-tag">Female</span>    11<span class="hljs-selector-class">.077640</span>
+<span class="hljs-selector-tag">Male</span>       9<span class="hljs-selector-class">.872383</span>
+<span class="hljs-selector-tag">Other</span>     11<span class="hljs-selector-class">.028173</span>
+<span class="hljs-selector-tag">Name</span>: <span class="hljs-selector-tag">rental_minutes</span>, <span class="hljs-selector-tag">dtype</span>: <span class="hljs-selector-tag">float64</span>
+</code></pre><pre><code class="lang-python">#Plotting the visuals
+fig, ax = plt.subplots(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>, figsize = [<span class="hljs-number">10</span>,<span class="hljs-number">5</span>])
+
+#Mean duration of use by gender identity
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>) 
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+sb.barplot(data = df_clean, x = 'member_gender', y = 'rental_minutes', color=base_color);
+plt.ylabel('Average Rental Minutes');
+plt.xlabel('User Gender Identity');
+plt.title('Mean Duration of Use by Gender Identity', fontsize = <span class="hljs-number">14</span>);
+
+#Duration of use by gender identity, using log transformation
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>) 
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+
+ax = sb.violinplot(data = df_clean, x = 'member_gender', y = 'log_duration', color = base_color)
+
+ax.set_yticks(log_trans(np.array([<span class="hljs-number">0.1</span>, <span class="hljs-number">0.3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">30</span>, <span class="hljs-number">100</span>, <span class="hljs-number">300</span>])))
+ax.set_yticklabels(['<span class="hljs-number">6</span> Seconds', '<span class="hljs-number">20</span> Seconds', '<span class="hljs-number">1</span> Minute', '<span class="hljs-number">3</span> Minutes', 
+                                                   '<span class="hljs-number">10</span> Minutes', '<span class="hljs-number">30</span> Minutes', '<span class="hljs-number">100</span> Minutes','<span class="hljs-number">300</span> Minutes'])
+plt.ylabel('Rental Minute Length (Log Minutes)');
+plt.xlabel('User Gender Identity');
+plt.title('Duration of Rental by Gender Identity', fontsize = <span class="hljs-number">14</span>);
+fig.tight_layout()
+</code></pre>
+<p><img src="output_68_0.png" alt="png"></p>
+<blockquote>
+<p>Female-and other-identifying users rent the bikes (on average) for longer than the male-identifying group. </p>
+</blockquote>
+<h3 id="gender-identity-and-day-of-the-week">Gender Identity and Day of the Week</h3>
+<pre><code class="lang-python">#plotting <span class="hljs-keyword">with</span> a clustered bar chart <span class="hljs-keyword">to</span> compare. The sheer number <span class="hljs-keyword">of</span> rentals by male users <span class="hljs-keyword">is</span> so high
+#it takes away from my ability <span class="hljs-keyword">to</span> see <span class="hljs-keyword">if</span> there are trends. I need <span class="hljs-keyword">to</span> look at this differently.
+ax = sb.countplot(data = df_clean, x = <span class="hljs-symbol">'day_of_rental</span>', hue = <span class="hljs-symbol">'member_gender</span>', palette = <span class="hljs-symbol">'Blues</span>');
+ax.legend(loc = <span class="hljs-number">1</span>, framealpha = <span class="hljs-number">1</span>)
+plt.xlabel(<span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> the Week');
+plt.ylabel(<span class="hljs-symbol">'Number</span> <span class="hljs-keyword">of</span> Rentals');
+plt.xticks(rotation = <span class="hljs-number">20</span>);
+plt.title(<span class="hljs-symbol">'Daily</span> Count <span class="hljs-keyword">of</span> Rentals by Gender Identity', fontsize = <span class="hljs-number">20</span>);
+</code></pre>
+<p><img src="output_71_0.png" alt="png"></p>
+<pre><code class="lang-python">fig, ax = plt.subplots(<span class="hljs-number">3</span>, <span class="hljs-number">1</span>, figsize=(<span class="hljs-number">15</span>, <span class="hljs-number">5</span>))
+fig.suptitle(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> Rentals by Gender Identity <span class="hljs-keyword">in</span> a Week', fontsize=<span class="hljs-number">20</span>);
+
+# males
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>) 
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+day_order = [<span class="hljs-symbol">'Monday</span>', <span class="hljs-symbol">'Tuesday</span>', <span class="hljs-symbol">'Wednesday</span>', <span class="hljs-symbol">'Thursday</span>', <span class="hljs-symbol">'Friday</span>', <span class="hljs-symbol">'Saturday</span>', <span class="hljs-symbol">'Sunday</span>']
+sb.countplot(data = df_clean.query(<span class="hljs-symbol">'member_gender</span> == <span class="hljs-string">"Male"</span>'), x = <span class="hljs-symbol">'day_of_rental</span>', 
+                  color = base_color, order = day_order);
+plt.legend(loc = <span class="hljs-number">1</span>, framealpha = <span class="hljs-number">1</span>)
+plt.xlabel(<span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> the Week');
+plt.ylabel(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> Rentals');
+plt.title(<span class="hljs-symbol">'Male</span> <span class="hljs-keyword">Use</span>');
+plt.xticks(rotation = <span class="hljs-number">45</span>);
+
+# females
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">2</span>)
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+day_order = [<span class="hljs-symbol">'Monday</span>', <span class="hljs-symbol">'Tuesday</span>', <span class="hljs-symbol">'Wednesday</span>', <span class="hljs-symbol">'Thursday</span>', <span class="hljs-symbol">'Friday</span>', <span class="hljs-symbol">'Saturday</span>', <span class="hljs-symbol">'Sunday</span>']
+sb.countplot(data = df_clean.query(<span class="hljs-symbol">'member_gender</span> == <span class="hljs-string">"Female"</span>'), x = <span class="hljs-symbol">'day_of_rental</span>', 
+                  color = base_color, order = day_order);
+plt.legend(loc = <span class="hljs-number">1</span>, framealpha = <span class="hljs-number">1</span>)
+plt.xlabel(<span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> the Week');
+plt.ylabel(<span class="hljs-string">' '</span>);
+plt.title(<span class="hljs-symbol">'Female</span> <span class="hljs-keyword">Use</span>');
+plt.xticks(rotation = <span class="hljs-number">45</span>);
+
+# other
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">3</span>) 
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+day_order = [<span class="hljs-symbol">'Monday</span>', <span class="hljs-symbol">'Tuesday</span>', <span class="hljs-symbol">'Wednesday</span>', <span class="hljs-symbol">'Thursday</span>', <span class="hljs-symbol">'Friday</span>', <span class="hljs-symbol">'Saturday</span>', <span class="hljs-symbol">'Sunday</span>']
+sb.countplot(data = df_clean.query(<span class="hljs-symbol">'member_gender</span> == <span class="hljs-string">"Other"</span>'), x = <span class="hljs-symbol">'day_of_rental</span>', 
+                  color = base_color, order = day_order);
+plt.legend(loc = <span class="hljs-number">1</span>, framealpha = <span class="hljs-number">1</span>)
+plt.xlabel(<span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> the Week');
+plt.ylabel(<span class="hljs-string">' '</span>);
+plt.title(<span class="hljs-symbol">'Other</span> <span class="hljs-keyword">Use</span>');
+plt.xticks(rotation = <span class="hljs-number">45</span>);
+</code></pre>
+<p><img src="output_72_0.png" alt="png"></p>
+<blockquote>
+<p>The use across each day of the week is comparable among the three identities. There is a slight uptick in use on Sundays for both females and other, but nothing drastic.</p>
+</blockquote>
+<h3 id="gender-identity-and-user-type">Gender Identity and User Type</h3>
+<pre><code class="lang-python">#I originally tried a sharey here, but decided <span class="hljs-keyword">not</span> to keep it, as it made it difficult to see the difference
+#<span class="hljs-keyword">in</span> customer <span class="hljs-keyword">type</span> <span class="hljs-type">within </span>each gender identity.
+fig, ax = plt.subplots(<span class="hljs-number">1</span>,<span class="hljs-number">3</span>, figsize=(<span class="hljs-number">15</span>, <span class="hljs-number">5</span>))
+
+fig.suptitle(<span class="hljs-symbol">'User</span> Types by Gender Identity', fontsize=<span class="hljs-number">20</span>);
+
+# males
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>)  
+sb.countplot(data = df_clean.query(<span class="hljs-symbol">'member_gender</span> == <span class="hljs-string">"Male"</span>'), x = <span class="hljs-symbol">'user_type</span>');
+plt.ylabel(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> User <span class="hljs-keyword">Type</span> <span class="hljs-type">Rentals');
+</span>plt.xlabel(<span class="hljs-symbol">'Male</span> Users');
+
+# females
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">2</span>)
+sb.countplot(data = df_clean.query(<span class="hljs-symbol">'member_gender</span> == <span class="hljs-string">"Female"</span>'), x = <span class="hljs-symbol">'user_type</span>');
+plt.ylabel(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> User <span class="hljs-keyword">Type</span> <span class="hljs-type">Rentals');
+</span>plt.xlabel(<span class="hljs-symbol">'Female</span> Users');
+
+# other
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">3</span>)
+sb.countplot(data = df_clean.query(<span class="hljs-symbol">'member_gender</span> == <span class="hljs-string">"Other"</span>'), x = <span class="hljs-symbol">'user_type</span>');
+plt.ylabel(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> User <span class="hljs-keyword">Type</span> <span class="hljs-type">Rentals');
+</span>plt.xlabel(<span class="hljs-symbol">'Other</span> Users');
+</code></pre>
+<p><img src="output_75_0.png" alt="png"></p>
+<blockquote>
+<p>There are consistently more Subscribers than Customers, regardless of gender identity.</p>
+</blockquote>
+<h3 id="age-groupings-and-rental-duration">Age Groupings and Rental Duration</h3>
+<pre><code class="lang-python">#I need to create age groupings for my bin edges
+bin_edges=[<span class="hljs-number">10</span>, <span class="hljs-number">20</span>, <span class="hljs-number">30</span>, <span class="hljs-number">40</span>, <span class="hljs-number">50</span>, <span class="hljs-number">60</span>, <span class="hljs-number">70</span>, <span class="hljs-number">80</span>]
+bin_names=['Under <span class="hljs-number">20</span>', '<span class="hljs-number">20</span>s', '<span class="hljs-number">30</span>s', '<span class="hljs-number">40</span>s', '<span class="hljs-number">50</span>s', '<span class="hljs-number">60</span>s', '<span class="hljs-number">70</span>s']
+df_clean['age_group']=pd.cut(df_clean['age'], bin_edges, labels=bin_names)
+df_clean['age_group'].value_counts()
+</code></pre>
+<pre><code><span class="hljs-number">20s</span>         <span class="hljs-number">69324</span>
+<span class="hljs-number">30s</span>         <span class="hljs-number">63311</span>
+<span class="hljs-number">40s</span>         <span class="hljs-number">21776</span>
+<span class="hljs-number">50s</span>         <span class="hljs-number">11158</span>
+Under <span class="hljs-number">20</span>     <span class="hljs-number">4166</span>
+<span class="hljs-number">60s</span>          <span class="hljs-number">2916</span>
+<span class="hljs-number">70s</span>           <span class="hljs-number">374</span>
+Name: age_group, dtype: <span class="hljs-keyword">int64</span>
+</code></pre><pre><code class="lang-python">#Age and duration
+plt.figure(figsize = [<span class="hljs-number">16</span>, <span class="hljs-number">5</span>])
+base_color = sb.color_palette()[<span class="hljs-number">0</span>]
+ax = sb.boxplot(data = df_clean, x='age_group', y='log_duration', color=base_color, showmeans = True);
+ax.set_yticks(log_trans(np.array([<span class="hljs-number">0.1</span>, <span class="hljs-number">0.3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">30</span>, <span class="hljs-number">100</span>, <span class="hljs-number">300</span>])))
+ax.set_yticklabels(['<span class="hljs-number">6</span> Seconds', '<span class="hljs-number">20</span> Seconds', '<span class="hljs-number">1</span> Minute', '<span class="hljs-number">3</span> Minutes','<span class="hljs-number">10</span> Minutes', '<span class="hljs-number">30</span> Minutes', 
+                    '<span class="hljs-number">100</span> Minutes','<span class="hljs-number">300</span> Minutes'])
+
+plt.xlabel('Age Groups');
+plt.ylabel('Rental Duration in Minutes (log)');
+plt.title('Rental Duration of Age Groups', fontsize = <span class="hljs-number">18</span>);
+</code></pre>
+<p><img src="output_79_0.png" alt="png"></p>
+<blockquote>
+<p>Each age group seems to be sticking fairly closely to the 10 minute range. Even in the visualization below, which demonstrates the spread with the mean, use appears consistent.</p>
+</blockquote>
+<pre><code class="lang-python">g = sb.FacetGrid(data = df_clean, col = <span class="hljs-string">'age_group'</span>, <span class="hljs-built_in">size</span> = <span class="hljs-number">5</span>, col_wrap = <span class="hljs-number">3</span>, margin_titles = <span class="hljs-literal">True</span>)
+
+def plot_mean(log_duration,**kwargs):
+    m = log_duration.mean()
+    plt.axvline(m, **kwargs)
+
+g.map(plt.hist, <span class="hljs-string">"log_duration"</span>)
+g.<span class="hljs-built_in">set</span>(xticks = log_trans(np.<span class="hljs-built_in">array</span>([<span class="hljs-number">0.1</span>, <span class="hljs-number">0.3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">30</span>, <span class="hljs-number">100</span>, <span class="hljs-number">300</span>])))
+g.<span class="hljs-built_in">set</span>(xticklabels = ([<span class="hljs-string">'6 Seconds'</span>, <span class="hljs-string">'20 Seconds'</span>, <span class="hljs-string">'1 Minute'</span>, <span class="hljs-string">'3 Minutes'</span>,<span class="hljs-string">'10 Minutes'</span>, <span class="hljs-string">'30 Minutes'</span>, 
+                    <span class="hljs-string">'100 Minutes'</span>,<span class="hljs-string">'300 Minutes'</span>]))
+
+titles = [<span class="hljs-string">'Under 20s'</span>, <span class="hljs-string">'20s'</span>, <span class="hljs-string">'30s'</span>, <span class="hljs-string">'40s'</span>, <span class="hljs-string">'50s'</span>, <span class="hljs-string">'60s'</span>, <span class="hljs-string">'70s'</span>]
+
+g.map(plot_mean, <span class="hljs-string">'log_duration'</span>, color=<span class="hljs-string">"red"</span>, linestyle=<span class="hljs-string">"dashed"</span>) 
+
+axes = g.axes.flatten()
+<span class="hljs-keyword">for</span> ax,title <span class="hljs-built_in">in</span> zip(g.axes.flatten(),titles):
+    ax.set_title(title)
+    ax.set_xlabel(<span class="hljs-string">"Duration of Rentals (Log Minutes)"</span>)
+    ax.set_ylabel(<span class="hljs-string">"Count of Rentals"</span>)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=<span class="hljs-number">45</span>)
+
+    <span class="hljs-keyword">for</span> tick <span class="hljs-built_in">in</span> ax.get_xticklabels():
+        tick.set_visible(<span class="hljs-literal">True</span>)
+
+plt.tight_layout()
+</code></pre>
+<p><img src="output_81_0.png" alt="png"></p>
+<blockquote>
+<p>Looking at the standard deviation (spread) of the data by age group shows much more clearly where there is variance across the different age groups. The users under the age of 20 rent the bikes with more variation.</p>
+</blockquote>
+<pre><code class="lang-python">#standard deviation <span class="hljs-keyword">by</span> age <span class="hljs-keyword">group</span> shows that there is more spread among the under<span class="hljs-number">-20</span> <span class="hljs-keyword">group</span>
+df_clean.groupby(<span class="hljs-string">'age_group'</span>)<span class="hljs-meta">[</span><span class="hljs-string">'log_duration'</span><span class="hljs-meta">]</span>.std()
+</code></pre>
+<pre><code><span class="hljs-selector-tag">age_group</span>
+<span class="hljs-selector-tag">Under</span> 20    0<span class="hljs-selector-class">.332493</span>
+20<span class="hljs-selector-tag">s</span>         0<span class="hljs-selector-class">.282566</span>
+30<span class="hljs-selector-tag">s</span>         0<span class="hljs-selector-class">.276143</span>
+40<span class="hljs-selector-tag">s</span>         0<span class="hljs-selector-class">.282199</span>
+50<span class="hljs-selector-tag">s</span>         0<span class="hljs-selector-class">.294988</span>
+60<span class="hljs-selector-tag">s</span>         0<span class="hljs-selector-class">.290998</span>
+70<span class="hljs-selector-tag">s</span>         0<span class="hljs-selector-class">.286334</span>
+<span class="hljs-selector-tag">Name</span>: <span class="hljs-selector-tag">log_duration</span>, <span class="hljs-selector-tag">dtype</span>: <span class="hljs-selector-tag">float64</span>
+</code></pre><pre><code class="lang-python"><span class="hljs-meta">#that spread is visible here</span>
+ax = sb.pointplot(data=df_clean, x=<span class="hljs-string">'age_group'</span>, y=<span class="hljs-string">'log_duration'</span>, <span class="hljs-keyword">color</span>=base_color, ci=<span class="hljs-string">'sd'</span>, linestyles=<span class="hljs-string">""</span>)<span class="hljs-comment">;</span>
+ax.set_ylabel(<span class="hljs-string">'Standard Deviation of Rental Duration (log minutes)'</span>)<span class="hljs-comment">;</span>
+ax.set_xlabel(<span class="hljs-string">'Renter Age Groups'</span>)<span class="hljs-comment">;</span>
+ax.set_title(<span class="hljs-string">'Standard Deviation of Rental Duration by Age Group'</span>, fontsize = <span class="hljs-number">20</span>)<span class="hljs-comment">;</span>
+
+log_mean = df_clean[<span class="hljs-string">'log_duration'</span>].mean()
+minutes_mean = df_clean[<span class="hljs-string">'rental_minutes'</span>].mean()
+
+<span class="hljs-keyword">print</span>(log_mean)
+<span class="hljs-keyword">print</span>(minutes_mean)
+</code></pre>
+<pre><code>0<span class="hljs-selector-class">.918029869107</span>
+10<span class="hljs-selector-class">.1764231566</span>
+</code></pre><p><img src="output_84_1.png" alt="png"></p>
+<blockquote>
+<p>This visualization shows that variation among the Under 20s.</p>
+</blockquote>
+<h3 id="user-type-and-age-group">User Type and Age Group</h3>
+<pre><code class="lang-python">fig, ax = plt.subplots(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>, figsize=(<span class="hljs-number">15</span>, <span class="hljs-number">10</span>))
+
+fig.suptitle(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> Rentals by User <span class="hljs-keyword">Type</span> <span class="hljs-type">and </span>Age Group', fontsize=<span class="hljs-number">20</span>);
+
+# Subscribers
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>)
+subscriber = df_clean.query(<span class="hljs-symbol">'user_type</span> == <span class="hljs-string">"Subscriber"</span>')
+sb.set(rc={<span class="hljs-string">"figure.figsize"</span>:(<span class="hljs-number">8</span>, <span class="hljs-number">8</span>)})
+ax = sb.countplot(x = subscriber[<span class="hljs-symbol">'age_group</span>'], order = subscriber[<span class="hljs-symbol">'age_group</span>'].value_counts().index)
+ax.set_xlabel(<span class="hljs-symbol">'Age</span> Groups');
+ax.set_ylabel(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> Rentals');
+ax.set_title(<span class="hljs-symbol">'Subscribers</span>');
+
+abs_values = subscriber[<span class="hljs-symbol">'age_group</span>'].value_counts(ascending=<span class="hljs-literal">False</span>)
+rel_values = subscriber[<span class="hljs-symbol">'age_group</span>'].value_counts(ascending=<span class="hljs-literal">False</span>, normalize=<span class="hljs-literal">True</span>).values * <span class="hljs-number">100</span>
+lbls = [f'{p[<span class="hljs-number">0</span>]} ({p[<span class="hljs-number">1</span>]:.<span class="hljs-number">0</span>f}%)' <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> zip(abs_values, rel_values)]
+
+<span class="hljs-keyword">for</span> p, label <span class="hljs-keyword">in</span> zip(ax.patches, lbls):
+    ax.annotate(label, (p.get_x()+<span class="hljs-number">0.375</span>, p.get_height()+<span class="hljs-number">0.15</span>),  horizontalalignment=<span class="hljs-symbol">'center</span>', verticalalignment=<span class="hljs-symbol">'middle</span>')
+
+#Customers
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>)
+customer = df_clean.query(<span class="hljs-symbol">'user_type</span> == <span class="hljs-string">"Customer"</span>')
+sb.set(rc={<span class="hljs-string">"figure.figsize"</span>:(<span class="hljs-number">8</span>, <span class="hljs-number">8</span>)})
+ax = sb.countplot(x = customer[<span class="hljs-symbol">'age_group</span>'], order = customer[<span class="hljs-symbol">'age_group</span>'].value_counts().index)
+ax.set_xlabel(<span class="hljs-symbol">'Age</span> Groups');
+ax.set_ylabel(<span class="hljs-symbol">'Count</span> <span class="hljs-keyword">of</span> Rentals');
+ax.set_title(<span class="hljs-symbol">'Customers</span>');
+
+abs_values = customer[<span class="hljs-symbol">'age_group</span>'].value_counts(ascending=<span class="hljs-literal">False</span>)
+rel_values = customer[<span class="hljs-symbol">'age_group</span>'].value_counts(ascending=<span class="hljs-literal">False</span>, normalize=<span class="hljs-literal">True</span>).values * <span class="hljs-number">100</span>
+lbls = [f'{p[<span class="hljs-number">0</span>]} ({p[<span class="hljs-number">1</span>]:.<span class="hljs-number">0</span>f}%)' <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> zip(abs_values, rel_values)]
+
+<span class="hljs-keyword">for</span> p, label <span class="hljs-keyword">in</span> zip(ax.patches, lbls):
+    ax.annotate(label, (p.get_x()+<span class="hljs-number">0.375</span>, p.get_height()+<span class="hljs-number">0.15</span>),  horizontalalignment=<span class="hljs-symbol">'center</span>', verticalalignment=<span class="hljs-symbol">'middle</span>')
+</code></pre>
+<p><img src="output_87_0.png" alt="png"></p>
+<blockquote>
+<p>The trend is similar across both age groups in each user type. Customers in their 30s is slightly higher than Subscribers in their 30s.</p>
+</blockquote>
+<h3 id="duration-of-rental-and-day-of-the-week">Duration of Rental and Day of the Week</h3>
+<pre><code class="lang-python">g = sb.FacetGrid(data = df_clean, col = <span class="hljs-string">'day_of_rental'</span>, <span class="hljs-built_in">size</span> = <span class="hljs-number">5</span>, col_wrap = <span class="hljs-number">3</span>, margin_titles = <span class="hljs-literal">True</span>)
+
+def plot_mean(log_duration,**kwargs):
+    m = log_duration.mean()
+    plt.axvline(m, **kwargs)
+
+g.map(plt.hist, <span class="hljs-string">"log_duration"</span>)
+g.<span class="hljs-built_in">set</span>(xticks = log_trans(np.<span class="hljs-built_in">array</span>([<span class="hljs-number">0.1</span>, <span class="hljs-number">0.3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">30</span>, <span class="hljs-number">100</span>, <span class="hljs-number">300</span>])))
+g.<span class="hljs-built_in">set</span>(xticklabels = ([<span class="hljs-string">'6 Seconds'</span>, <span class="hljs-string">'20 Seconds'</span>, <span class="hljs-string">'1 Minute'</span>, <span class="hljs-string">'3 Minutes'</span>,<span class="hljs-string">'10 Minutes'</span>, <span class="hljs-string">'30 Minutes'</span>, 
+                    <span class="hljs-string">'100 Minutes'</span>,<span class="hljs-string">'300 Minutes'</span>]))
+
+titles = [<span class="hljs-string">'Monday'</span>, <span class="hljs-string">'Tuesday'</span>, <span class="hljs-string">'Wednesday'</span>, <span class="hljs-string">'Thursday'</span>, <span class="hljs-string">'Friday'</span>, <span class="hljs-string">'Saturday'</span>, <span class="hljs-string">'Sunday'</span>]
+
+g.map(plot_mean, <span class="hljs-string">'log_duration'</span>, color=<span class="hljs-string">"red"</span>, linestyle=<span class="hljs-string">"dashed"</span>) 
+
+axes = g.axes.flatten()
+<span class="hljs-keyword">for</span> ax,title <span class="hljs-built_in">in</span> zip(g.axes.flatten(),titles):
+    ax.set_title(title)
+    ax.set_xlabel(<span class="hljs-string">"Duration of Rentals"</span>)
+    ax.set_ylabel(<span class="hljs-string">"Count of Rentals"</span>)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=<span class="hljs-number">45</span>)
+
+    <span class="hljs-keyword">for</span> tick <span class="hljs-built_in">in</span> ax.get_xticklabels():
+        tick.set_visible(<span class="hljs-literal">True</span>)
+
+plt.tight_layout()
+</code></pre>
+<p><img src="output_90_0.png" alt="png"></p>
+<pre><code class="lang-python"><span class="hljs-comment">#standard deviation shows more spread on the weekends than during the week</span>
+df_clean.groupby(<span class="hljs-string">'day_of_rental'</span>)[<span class="hljs-string">'log_duration'</span>].std()
+</code></pre>
+<pre><code><span class="hljs-selector-tag">day_of_rental</span>
+<span class="hljs-selector-tag">Monday</span>       0<span class="hljs-selector-class">.280302</span>
+<span class="hljs-selector-tag">Tuesday</span>      0<span class="hljs-selector-class">.271720</span>
+<span class="hljs-selector-tag">Wednesday</span>    0<span class="hljs-selector-class">.273177</span>
+<span class="hljs-selector-tag">Thursday</span>     0<span class="hljs-selector-class">.276726</span>
+<span class="hljs-selector-tag">Friday</span>       0<span class="hljs-selector-class">.276006</span>
+<span class="hljs-selector-tag">Saturday</span>     0<span class="hljs-selector-class">.312242</span>
+<span class="hljs-selector-tag">Sunday</span>       0<span class="hljs-selector-class">.319072</span>
+<span class="hljs-selector-tag">Name</span>: <span class="hljs-selector-tag">log_duration</span>, <span class="hljs-selector-tag">dtype</span>: <span class="hljs-selector-tag">float64</span>
+</code></pre><pre><code class="lang-python">#<span class="hljs-keyword">and</span> <span class="hljs-keyword">is</span> demonstrated <span class="hljs-keyword">in</span> this visualization
+ax = sb.pointplot(data=df_clean, x=<span class="hljs-symbol">'day_of_rental</span>', y=<span class="hljs-symbol">'log_duration</span>', color=base_color, ci=<span class="hljs-symbol">'sd</span>', linestyles=<span class="hljs-string">""</span>);
+ax.set_ylabel(<span class="hljs-symbol">'Standard</span> Deviation <span class="hljs-keyword">of</span> Rental Duration (log minutes)');
+ax.set_xlabel(<span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> Rental');
+ax.set_title(<span class="hljs-symbol">'Standard</span> Deviation <span class="hljs-keyword">of</span> Rental Duration by Day <span class="hljs-keyword">of</span> the Week', fontsize = <span class="hljs-number">18</span>);
+</code></pre>
+<p><img src="output_92_0.png" alt="png"></p>
+<blockquote>
+<p>This makes sense; use during the week has already been shown to be consistent and that weekend use is much more varied. This visualization is additional support of that idea.</p>
+</blockquote>
+<h3 id="rental-hour-and-duration">Rental Hour and Duration</h3>
+<pre><code class="lang-python">fig, <span class="hljs-attr">ax</span> = plt.subplots(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-attr">figsize=(20,</span> <span class="hljs-number">5</span>))
+fig.suptitle('Mean Duration of Rentals by Time of Day', <span class="hljs-attr">fontsize=20);</span>
+
+<span class="hljs-comment"># Rental Minutes</span>
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>) 
+<span class="hljs-attr">bin_edges</span> = np.arange(<span class="hljs-number">0.6</span>, <span class="hljs-number">23</span>+<span class="hljs-number">0.2</span>, <span class="hljs-number">0.2</span>)
+<span class="hljs-attr">bin_centers</span> = bin_edges[:-<span class="hljs-number">1</span>] + <span class="hljs-number">0.1</span>
+
+<span class="hljs-attr">hours_binned</span> = pd.cut(df_clean['rental_hour'], bin_edges, <span class="hljs-attr">include_lowest</span> = True)
+hours_binned
+
+<span class="hljs-attr">minutes_mean</span> = df_clean['rental_minutes'].groupby(hours_binned).mean()
+<span class="hljs-attr">minutes_std</span> = df_clean['rental_minutes'].groupby(hours_binned).std()
+
+plt.errorbar(<span class="hljs-attr">x=bin_centers,</span> <span class="hljs-attr">y=minutes_mean,</span> <span class="hljs-attr">yerr=minutes_std,</span> <span class="hljs-attr">fmt='o',</span> <span class="hljs-attr">color</span> = 'black')
+plt.xlabel('Hour of the Day');
+plt.ylabel('Mean Duration of Rental (Minutes)');
+
+<span class="hljs-comment">#Log Duration</span>
+plt.subplot(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>) 
+<span class="hljs-attr">bin_edges</span> = np.arange(<span class="hljs-number">0.6</span>, <span class="hljs-number">23</span>+<span class="hljs-number">0.2</span>, <span class="hljs-number">0.2</span>)
+<span class="hljs-attr">bin_centers</span> = bin_edges[:-<span class="hljs-number">1</span>] + <span class="hljs-number">0.1</span>
+
+<span class="hljs-attr">hours_binned</span> = pd.cut(df_clean['rental_hour'], bin_edges, <span class="hljs-attr">include_lowest</span> = True)
+hours_binned
+
+<span class="hljs-attr">minutes_mean</span> = df_clean['log_duration'].groupby(hours_binned).mean()
+<span class="hljs-attr">minutes_std</span> = df_clean['log_duration'].groupby(hours_binned).std()
+
+
+plt.errorbar(<span class="hljs-attr">x=bin_centers,</span> <span class="hljs-attr">y=minutes_mean,</span> <span class="hljs-attr">yerr=minutes_std,</span> <span class="hljs-attr">fmt='o',</span> <span class="hljs-attr">color</span> = 'black');
+plt.xlabel('Hour of the Day');
+plt.ylabel('Mean Duration of Rental (Log Minutes)');
+plt.yscale('log');
+</code></pre>
+<p><img src="output_95_0.png" alt="png"></p>
+<blockquote>
+<p>The duration of rental pattern is similar in both observations. </p>
+</blockquote>
+<h3 id="talk-about-some-of-the-relationships-you-observed-in-this-part-of-the-investigation-how-did-the-feature-s-of-interest-vary-with-other-features-in-the-dataset-">Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?</h3>
+<ul>
+<li><p>Customers use the bikes with more frequency throughout the week, whereas Subscribers are typically using the bikes during the week more often than the weekends.</p>
+</li>
+<li><p>Subscribers tend to use the bikes for quick trips (under 10 minutes), whereas Customers are using the bikes for longer purposes (over 10 minutes).</p>
+</li>
+<li><p>Regardless of the day of the week, the median rental time was consistent, even if the spread was greater on the weekends. Mean and Median rental duration is longer on the weekends, but not by much. This is clearly demonstrated in the log duration view of the box plot.</p>
+</li>
+<li><p>Users identifying as Female skewed younger than the other two identity groups. They also averaged more minutes than the Male group, but rented the bikes for a similar length of time on average to the Other group.</p>
+</li>
+<li><p>There were no obvious differences across member gender groups throughout the week in terms of number of rentals per day.</p>
+</li>
+<li><p>Median duration was consistent across all age groups. The Under 20s group demonstrated more variance in rental time, which makes me wonder if that group is also mostly females.</p>
+</li>
+<li><p>Age does not appear to be a factor in rental duration, all age groups broadly rent the bikes for similar lengths of time. The Under 20 group had more variation in length of rentals and the median rental time was slightly higher in the 60s age group.</p>
+</li>
+<li><p>In terms of customer type and age group, customers in the Under 20 and 30s age groups rented bikes at a higher rate than subscribers in the same groups.</p>
+</li>
+<li><p>Duration of use during the week is consistent and there is more variance in duration of use on the weekends. Users are renting for longer periods during that time. Rental duration and time of day is also reflective of the idea that weekday use is for commuting and weekend use is likely for a different purpose.</p>
+</li>
+</ul>
+<h3 id="did-you-observe-any-interesting-relationships-between-the-other-features-not-the-main-feature-s-of-interest-">Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?</h3>
+<ul>
+<li>More so the lack of a relationship - it doesn&#39;t seem that age is really as big of a factor on its own. I think it will be more of an influencing factor in the multivariate exploration. I thought that age would have a larger impact on rentals.</li>
+</ul>
+<h2 id="multivariate-exploration">Multivariate Exploration</h2>
+<h3 id="age-gender-user-type">Age, Gender, User Type</h3>
+<pre><code class="lang-python">fig, ax = plt.subplots(3,1, sharey = True, figsize=(15, 15))
+
+fig.suptitle('Mean <span class="hljs-keyword">Use</span> <span class="hljs-keyword">by</span> <span class="hljs-keyword">Member</span> Gender <span class="hljs-keyword">Identity</span><span class="hljs-string">', fontsize=20);
+
+# males
+#plt.subplot(3, 1, 1)
+sb.barplot(data = df_clean.query('</span>member_gender == <span class="hljs-string">"Male"</span><span class="hljs-string">'), x = '</span>user_type<span class="hljs-string">', 
+                       y = '</span>rental_minutes<span class="hljs-string">', hue = '</span>age_group<span class="hljs-string">', palette = '</span>autumn<span class="hljs-string">', ax = ax[0]);
+ax[0].set_ylabel('</span>Average Rental Minutes<span class="hljs-string">');
+ax[0].set_xlabel('</span>Male <span class="hljs-keyword">Users</span><span class="hljs-string">');
+ax[0].legend(title = '</span>Age <span class="hljs-keyword">Groups</span><span class="hljs-string">', loc = '</span><span class="hljs-keyword">upper</span> center<span class="hljs-string">');
+
+# females
+#plt.subplot(3, 1, 2)
+sb.barplot(data = df_clean.query('</span>member_gender == <span class="hljs-string">"Female"</span><span class="hljs-string">'), x = '</span>user_type<span class="hljs-string">', 
+                       y = '</span>rental_minutes<span class="hljs-string">', hue = '</span>age_group<span class="hljs-string">', palette = '</span>ocean<span class="hljs-string">', ax = ax[1]);
+ax[1].set_ylabel('</span>Average Rental Minutes<span class="hljs-string">');
+ax[1].set_xlabel('</span>Female <span class="hljs-keyword">Users</span><span class="hljs-string">');
+ax[1].legend(title = '</span>Age <span class="hljs-keyword">Groups</span><span class="hljs-string">', loc = '</span><span class="hljs-keyword">upper</span> center<span class="hljs-string">');
+
+# other
+#plt.subplot(3, 1, 3)
+sb.barplot(data = df_clean.query('</span>member_gender == <span class="hljs-string">"Other"</span><span class="hljs-string">'), x = '</span>user_type<span class="hljs-string">', 
+           y = '</span>rental_minutes<span class="hljs-string">', hue = '</span>age_group<span class="hljs-string">', palette = '</span>Reds<span class="hljs-string">', ax = ax[2]);
+ax[2].set_ylabel('</span>Average Rental Minutes<span class="hljs-string">');
+ax[2].set_xlabel('</span>Other <span class="hljs-keyword">Users</span><span class="hljs-string">');
+ax[2].legend(title = '</span>Age <span class="hljs-keyword">Groups</span><span class="hljs-string">', loc = '</span><span class="hljs-keyword">upper</span> center<span class="hljs-string">');</span>
+</code></pre>
+<p><img src="output_100_0.png" alt="png"></p>
+<blockquote>
+<p>This visualization supports the idea that Customers rent the bikes for longer periods of time, on average. It also shows that Male-identifying Subscribers use the bikes for longer rental periods as age increases. Female-identifying Subscribers have a higher average duration in the youngest group, which declines through the 40s age group and then increases again with the older group of 50s and 60s.</p>
+</blockquote>
+<h3 id="user-type-by-gender-identity-and-mean-rental-duration">User Type by Gender Identity and Mean Rental Duration</h3>
+<pre><code class="lang-python">fig, <span class="hljs-attr">ax</span> = plt.subplots(<span class="hljs-number">1</span>,<span class="hljs-number">3</span>, <span class="hljs-attr">sharey</span> = True, <span class="hljs-attr">figsize=(15,</span> <span class="hljs-number">5</span>))
+
+fig.suptitle('Mean Use by Member Gender Identity', <span class="hljs-attr">fontsize=20);</span>
+
+<span class="hljs-comment"># males  </span>
+sb.barplot(<span class="hljs-attr">data</span> = df_clean.query('<span class="hljs-attr">member_gender</span> == <span class="hljs-string">"Male"</span>'), <span class="hljs-attr">x</span> = 'user_type', 
+           <span class="hljs-attr">y</span> = 'rental_minutes', <span class="hljs-attr">ax</span> = ax[<span class="hljs-number">0</span>]);
+ax[<span class="hljs-number">0</span>].set_ylabel('Average Rental Minutes');
+ax[<span class="hljs-number">0</span>].set_xlabel('Male Users');
+
+
+<span class="hljs-comment"># females</span>
+sb.barplot(<span class="hljs-attr">data</span> = df_clean.query('<span class="hljs-attr">member_gender</span> == <span class="hljs-string">"Female"</span>'), <span class="hljs-attr">x</span> = 'user_type', 
+           <span class="hljs-attr">y</span> = 'rental_minutes', <span class="hljs-attr">ax</span> = ax[<span class="hljs-number">1</span>]);
+ax[<span class="hljs-number">1</span>].set_ylabel(' ');
+ax[<span class="hljs-number">1</span>].set_xlabel('Female Users');
+
+<span class="hljs-comment"># other</span>
+sb.barplot(<span class="hljs-attr">data</span> = df_clean.query('<span class="hljs-attr">member_gender</span> == <span class="hljs-string">"Other"</span>'), <span class="hljs-attr">x</span> = 'user_type', 
+           <span class="hljs-attr">y</span> = 'rental_minutes', <span class="hljs-attr">ax</span> = ax[<span class="hljs-number">2</span>]);
+ax[<span class="hljs-number">2</span>].set_ylabel(' ');
+ax[<span class="hljs-number">2</span>].set_xlabel('Other Users');
+</code></pre>
+<p><img src="output_103_0.png" alt="png"></p>
+<blockquote>
+<p>Again, regardless of gender identity, Customers rent the bikes for longer periods of time.</p>
+</blockquote>
+<h3 id="duration-day-of-the-week-and-user-type">Duration, Day of the Week, and User Type</h3>
+<pre><code class="lang-python">sb.set(rc={<span class="hljs-string">"figure.figsize"</span>:(<span class="hljs-number">10</span>,<span class="hljs-number">10</span>)})
+ax = sb.pointplot(data = df_clean, x = <span class="hljs-symbol">'user_type</span>', y = <span class="hljs-symbol">'rental_minutes</span>', hue = <span class="hljs-symbol">'day_of_rental</span>',
+                  dodge = <span class="hljs-number">0.3</span>, linestyles = <span class="hljs-string">""</span>)
+ax.set_xlabel(<span class="hljs-symbol">'User</span> Types');
+ax.set_ylabel(<span class="hljs-symbol">'Avg</span> Duration <span class="hljs-keyword">of</span> Rental (Minutes)');
+plt.legend(title = <span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> Rental');
+plt.title(<span class="hljs-symbol">'Duration</span> <span class="hljs-keyword">of</span> Rental by Day <span class="hljs-keyword">of</span> the Week <span class="hljs-keyword">and</span> User <span class="hljs-keyword">Type</span>', fontsize = <span class="hljs-number">20</span>);
+</code></pre>
+<p><img src="output_106_0.png" alt="png"></p>
+<blockquote>
+<p>Subscribers&#39; rental behavior is quite predictable, whereas Customer&#39;s use can be assumed to be longer, but there is some variation in the average duration of rental.</p>
+</blockquote>
+<h3 id="duration-day-of-the-week-gender-identity">Duration, Day of the Week, Gender Identity</h3>
+<pre><code class="lang-python">#I am using the rental minutes value <span class="hljs-keyword">to</span> see any trends
+
+ax = sb.pointplot(data = df_clean, x = <span class="hljs-symbol">'member_gender</span>', y = <span class="hljs-symbol">'rental_minutes</span>', hue = <span class="hljs-symbol">'day_of_rental</span>',
+                  dodge = <span class="hljs-number">0.3</span>, linestyles = <span class="hljs-string">""</span>)
+ax.set_xlabel(<span class="hljs-symbol">'Gender</span> Identity');
+ax.set_ylabel(<span class="hljs-symbol">'Avg</span> Duration <span class="hljs-keyword">of</span> Rental (Minutes)');
+plt.legend(title = <span class="hljs-symbol">'Day</span> <span class="hljs-keyword">of</span> Rental');
+plt.title(<span class="hljs-symbol">'Duration</span> <span class="hljs-keyword">of</span> Rental by Day <span class="hljs-keyword">of</span> the Week <span class="hljs-keyword">and</span> User Gender Identity', fontsize=<span class="hljs-number">17</span>);
+</code></pre>
+<p><img src="output_109_0.png" alt="png"></p>
+<pre><code class="lang-python">#I need <span class="hljs-keyword">to</span> <span class="hljs-keyword">use</span> my log duration value <span class="hljs-keyword">to</span> get a better view <span class="hljs-keyword">of</span> the data <span class="hljs-keyword">to</span> look <span class="hljs-keyword">for</span> any trends
+day_order = [<span class="hljs-symbol">'Monday</span>', <span class="hljs-symbol">'Tuesday</span>', <span class="hljs-symbol">'Wednesday</span>', <span class="hljs-symbol">'Thursday</span>', <span class="hljs-symbol">'Friday</span>', <span class="hljs-symbol">'Saturday</span>', <span class="hljs-symbol">'Sunday</span>']
+
+
+g = sb.FacetGrid(data = df_clean, col = <span class="hljs-symbol">'day_of_rental</span>', col_order = day_order, size = <span class="hljs-number">5</span>, col_wrap = <span class="hljs-number">3</span>)
+g.<span class="hljs-keyword">map</span>(sb.boxplot, <span class="hljs-symbol">'member_gender</span>', <span class="hljs-symbol">'log_duration</span>', showmeans = <span class="hljs-literal">True</span>);
+
+
+titles = [<span class="hljs-symbol">'Monday</span>', <span class="hljs-symbol">'Tuesday</span>', <span class="hljs-symbol">'Wednesday</span>', <span class="hljs-symbol">'Thursday</span>', <span class="hljs-symbol">'Friday</span>', <span class="hljs-symbol">'Saturday</span>', <span class="hljs-symbol">'Sunday</span>']
+
+
+axes = g.axes.flatten()
+<span class="hljs-keyword">for</span> ax,title <span class="hljs-keyword">in</span> zip(g.axes.flatten(),titles):
+    ax.set_title(title)
+    ax.set_xlabel(<span class="hljs-string">"User Gender Identity"</span>)
+    ax.set_ylabel(<span class="hljs-string">"Log Duration of Use"</span>)
+    ax.set_xticklabels(ax.get_xticklabels())
+
+    <span class="hljs-keyword">for</span> tick <span class="hljs-keyword">in</span> ax.get_xticklabels():
+        tick.set_visible(<span class="hljs-literal">True</span>)
+
+plt.tight_layout()
+</code></pre>
+<pre><code>/opt/conda/<span class="hljs-class"><span class="hljs-keyword">lib</span>/<span class="hljs-title">python3</span>.6/<span class="hljs-title">site</span>-<span class="hljs-title">packages</span>/<span class="hljs-title">seaborn</span>/<span class="hljs-title">axisgrid</span>.<span class="hljs-title">py</span>:703: <span class="hljs-title">UserWarning</span>: <span class="hljs-title">Using</span> <span class="hljs-title">the</span> <span class="hljs-title">boxplot</span> <span class="hljs-title">function</span> <span class="hljs-title">without</span> <span class="hljs-title">specifying</span> `<span class="hljs-title">order</span>` <span class="hljs-title">is</span> <span class="hljs-title">likely</span> <span class="hljs-title">to</span> <span class="hljs-title">produce</span> <span class="hljs-title">an</span> <span class="hljs-title">incorrect</span> <span class="hljs-title">plot</span>.</span>
+  warnings.warn(warning)
+</code></pre><p><img src="output_110_1.png" alt="png"></p>
+<blockquote>
+<p>These visualizations show how the typical user is the most predictable (male-identifying); Female-identifying users rent for longer with increasing variation, and other-identifying rent for the longest with most variation. All groups show similar usage trends of less time during the week and longer rentals on weekends.</p>
+</blockquote>
+<h3 id="talk-about-some-of-the-relationships-you-observed-in-this-part-of-the-investigation-were-there-features-that-strengthened-each-other-in-terms-of-looking-at-your-feature-s-of-interest-">Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?</h3>
+<ul>
+<li><p>Customers use the bikes for longer periods of time regardless of gender identity. This is consistent across each age group between people who identify as males and females, but there is much more uncertaintly when it comes to people who identify as other. That group of people has varying rental duration averages in both the subscriber and customer user types.</p>
+</li>
+<li><p>Male identifying Subscribers use the bikes for longer rentals as age increases.</p>
+</li>
+<li><p>Female identifying Subscribers have a higher average duration in the youngest group, which declines through the 40s age group and then increases again with the older group of 50s and 60s.</p>
+</li>
+<li><p>Again, it is obvious that Subscribers are using the bikes for short periods of time each day, with an increase in average duration on the weekends, but Customers are renting for longer periods throughout the week, and also for longer periods on the weekends. Each day a Customer rents a bike, the average rental duration is much more variable and less predictable compared to Subscribers.</p>
+</li>
+<li><p>Gender Identity also indicates a simlar pattern, where in male-identifying users&#39; rental duration during the week is the lowest with the least amount of variance. Female-identifying users are renting the bikes for longer average durations and with more variance than the male-identifying users. This trend continues to increase with the other-identifying users group; rentals are shorter during the week than on weekends, but the spread of average rental times is much greater than the other two.</p>
+</li>
+</ul>
+<h3 id="were-there-any-interesting-or-surprising-interactions-between-features-">Were there any interesting or surprising interactions between features?</h3>
+<ul>
+<li>I really thought that the people who identified as Other would have also been comprised of more Customer users, but that wasn&#39;t the case.</li>
+</ul>
+<h2 id="conclusions">Conclusions</h2>
+<p>I started out this project looking to understand who the typical user is of the GoBike program. I did not have any particular pre-conceived notions of what this user would look like, but I am a little surprised nonetheless.</p>
+<p>The users are overwhelmingly Subscribers (people with an annual/monthly membership), male-identifying, and in his early-30s. He most often using the bikes to commute to and from work during the week, and occasionally on the weekend. His use is fairly consistent and predictable.</p>
+<p>What was surprising and most interesting was the characteristics of the other kinds of people using the bikes. Female-identifying users are younger and use the bikes, on average, for longer periods of time. There is also an increase in variation of average rental duration and they rent the bikes for longer on the weekends, too.</p>
+<p>People who identified as Other showed the most variation in their use. While they were also overwhelmingly Subscribers, they had the least predictable pattern of use. Although, similarly to the other groups, duration of rentals during the week is shorter than weekends.</p>
+<p>Customers (people who pay per use) skewed younger and rented the bikes for longer periods of time, on average.</p>
+<p>It would be interesting to have more information, such as userID to see if there are Customers who are using the bikes often enough that they don&#39;t realize they could benefit from becoming Subscribers. Also, not every rental had a gender identity selected. It&#39;s entirely possible that casual users are not inputting that kind of information when they rent and Subscribers are. This dataset probably could be more useful to determine which station locations are being used the most or least and adjust availability based on those numbers.</p>
+</body></html>
