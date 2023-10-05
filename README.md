@@ -11,6 +11,11 @@ I have a lot of interests and I am _really_ interested in learning about why I l
   <li><a href="go_bikes/GoBikes" title="GoBikes">GoBike Rentals: Visualizations (Python/Jupyter)</a></li>
 </ul>
 
+## My approach to data management and data governance:
+<ul>
+   <li><a href="https://github.com/kjchrz03/karolines-questions/blob/main/Generic%20Data%20Strategy%20Proposal.pdf">Sample Data Strategy Approach and Framework</a></li>
+</ul>
+
 ## I also enjoy presenting about my data:
 <ul>
   <li><a href="https://prezi.com/mfgcbcnbiscb/student-involvement-at-svc/">How I built a Student Involvement program by using data</a></li>
