@@ -14,6 +14,7 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 ## My approach to data management and data governance:
 <ul>
    <li><a href="https://github.com/kjchrz03/karolines-questions/blob/main/Generic%20Data%20Strategy%20Proposal.pdf">Sample Data Strategy Approach and Framework</a></li>
+   <li><a href="https://github.com/kjchrz03/karolines-questions/blob/main/Data%20Management%20Consult.pdf">Conducting a High Level Evaluation</a></li>
 </ul>
 
 ## I also enjoy presenting about my data:
