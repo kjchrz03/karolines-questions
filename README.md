@@ -29,6 +29,12 @@ I have a lot of interests and I am _really_ interested in learning about why I l
   <li><a href="https://confirm.udacity.com/KKCYTZS4">Udacity Data Analyst Nanodegree Program</a></li>
 </ul>
 <ul>
+  <li><a href="[https://confirm.udacity.com/KKCYTZS4](https://api.accredible.com/v1/frontend/credential_website_embed_image/badge/78859476)">dbt Fundamentals</a></li>
+</ul>
+<ul>
+  <li><a href="https://confirm.udacity.com/KKCYTZS4">Udacity Data Analyst Nanodegree Program</a></li>
+</ul>
+<ul>
   <li><a href="https://www.hackerrank.com/certificates/89b0fd2b021a">HackerRank SQL(Advanced) Certificate</a></li>
 </ul>
 <ul>
@@ -37,6 +43,8 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 <ul>
   <li><a href="https://www.hackerrank.com/certificates/787bdc4fdd3a">HackerRank SQL(Basic) Certificate</a></li>
 </ul>
+
+
 
 ## Find me online here: 
 <ul>
