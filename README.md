@@ -32,7 +32,7 @@ I have a lot of interests and I am _really_ interested in learning about why I l
   <li><a href="[https://confirm.udacity.com/KKCYTZS4](https://api.accredible.com/v1/frontend/credential_website_embed_image/badge/78859476)">dbt Fundamentals</a></li>
 </ul>
 <ul>
-  <li><a href="https://confirm.udacity.com/KKCYTZS4">Udacity Data Analyst Nanodegree Program</a></li>
+  <li><a href="certificates/CertificateOfCompletion_Career Essentials in Business Analysis by Microsoft and LinkedIn.pdf">Career Essentials in Business Analysis (Microsoft) </a></li>
 </ul>
 <ul>
   <li><a href="https://www.hackerrank.com/certificates/89b0fd2b021a">HackerRank SQL(Advanced) Certificate</a></li>
