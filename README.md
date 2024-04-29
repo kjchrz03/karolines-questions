@@ -26,17 +26,16 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 
 ## List of current and past professional projects:
 
-
-<li> Fishbowl (ERP) Data Integrity Project | January 2024 - present
+Fishbowl (ERP) Data Integrity Project | January 2024 - present
   <ul> <li>Lead a team comprised of engineers and a product manager to overhaul the company’s approach to data management and data integrity within the ERP
   <li> Implement a parent ID system, simplify and normalize part numbers, redefine business rules, and direct the strategy for the approach to model-building and process development
   <li> Institute a data processing audit trail, conduct kaizen testing, and provide continuous process improvement with the input of stakeholders and users
   <li> Write formal data management and data lifecycle documentation
   <li> Create a culture of data management and governance that is informed by best practices
 <li> Skills: data governance • data management • data quality • project management • critical thinking • cross-functional collaboration • data strategy • subject matter expert </li>
+  </ul>
 
-
-<li> Data Excellence | May 2023 - December 2023
+Data Excellence | May 2023 - December 2023
 <ul> <li>Develop a data governance model, process documentation, and training resources for both users and analysts
 <li> Collaborate on the redesign of the data model for the BI platform, Looker 
 <li> Transform data and build models in dbt to improve data flowing into Looker
@@ -44,8 +43,9 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 <li> Conduct data maturity assessments for various departments and develop an improvement roadmap 
 <li> Skills: data governance • data management • data quality • project management • advanced Python • critical thinking • cross-functional collaboration
  </li>
+</ul>
  
-<li> Database Remodel Project | January 2019 - June 2022
+Database Remodel Project | January 2019 - June 2022
 <ul> <li>Overhauled 20-year-old Access database comprised of relational data structures by using advanced  SQL queries and VBA code 
 <li>Assembled and supervised the database management team 
 <li>Created a modern, streamlined, and automated workflow management system that has increased  office productivity and efficiency 
