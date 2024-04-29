@@ -27,8 +27,9 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 ## List of current and past professional projects:
 
 <ul>
-  <li> Fishbowl (ERP) Data Integrity Project | January 2024 - present
-Lead a team comprised of engineers and a product manager to overhaul the company’s approach to data management and data integrity within the ERP
+  <li> Fishbowl (ERP) Data Integrity Project | January 2024 - present</li>
+
+  Lead a team comprised of engineers and a product manager to overhaul the company’s approach to data management and data integrity within the ERP
 Implement a parent ID system, simplify and normalize part numbers, redefine business rules, and direct the strategy for the approach to model-building and process development
 Institute a data processing audit trail, conduct kaizen testing, and provide continuous process improvement with the input of stakeholders and users
 Write formal data management and data lifecycle documentation
