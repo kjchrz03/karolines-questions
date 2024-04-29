@@ -58,7 +58,7 @@ Database Remodel Project | January 2019 - June 2022
   <li><a href="https://confirm.udacity.com/KKCYTZS4">Udacity Data Analyst Nanodegree Program</a></li>
 </ul>
 <ul>
-  <li><a href="[https://confirm.udacity.com/KKCYTZS4](https://api.accredible.com/v1/frontend/credential_website_embed_image/badge/78859476)">dbt Fundamentals</a></li>
+  <li><a href="https://credentials.getdbt.com/24f5a8cb-eca7-4bae-93d6-957e9bf27284">dbt Fundamentals</a></li>
 </ul>
 <ul>
   <li><a href="certificates/CertificateOfCompletion_Career Essentials in Business Analysis by Microsoft and LinkedIn.pdf">Career Essentials in Business Analysis (Microsoft) </a></li>
