@@ -28,13 +28,12 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 
 <ul>
   <li> Fishbowl (ERP) Data Integrity Project | January 2024 - present</li>
-
-  Lead a team comprised of engineers and a product manager to overhaul the company’s approach to data management and data integrity within the ERP
-Implement a parent ID system, simplify and normalize part numbers, redefine business rules, and direct the strategy for the approach to model-building and process development
-Institute a data processing audit trail, conduct kaizen testing, and provide continuous process improvement with the input of stakeholders and users
-Write formal data management and data lifecycle documentation
-Create a culture of data management and governance that is informed by best practices
-Skills: data governance • data management • data quality • project management • critical thinking • cross-functional collaboration • data strategy • subject matter expert </li>
+  <li> Lead a team comprised of engineers and a product manager to overhaul the company’s approach to data management and data integrity within the ERP
+  <li> Implement a parent ID system, simplify and normalize part numbers, redefine business rules, and direct the strategy for the approach to model-building and process development
+  <li> Institute a data processing audit trail, conduct kaizen testing, and provide continuous process improvement with the input of stakeholders and users
+  <li> Write formal data management and data lifecycle documentation
+  <li> Create a culture of data management and governance that is informed by best practices
+<li> Skills: data governance • data management • data quality • project management • critical thinking • cross-functional collaboration • data strategy • subject matter expert </li>
 
 
 <li> Data Excellence | May 2023 - December 2023
