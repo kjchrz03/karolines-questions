@@ -64,6 +64,9 @@ Database Remodel Project | January 2019 - June 2022
   <li><a href="certificates/CertificateOfCompletion_Career Essentials in Business Analysis by Microsoft and LinkedIn.pdf">Career Essentials in Business Analysis (Microsoft) </a></li>
 </ul>
 <ul>
+  <li><a href="https://www.coursera.org/account/accomplishments/verify/2RARXNY6UQCW?utm_product=course">Foundations of Sports Analytics, Data, Representation, and Models Certificate</a></li>
+</ul>
+<ul>
   <li><a href="https://www.hackerrank.com/certificates/89b0fd2b021a">HackerRank SQL(Advanced) Certificate</a></li>
 </ul>
 <ul>
