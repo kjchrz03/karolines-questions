@@ -37,19 +37,19 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 
 
 <li> Data Excellence | May 2023 - December 2023
-Develop a data governance model, process documentation, and training resources for both users and analysts
-Collaborate on the redesign of the data model for the BI platform, Looker 
-Transform data and build models in dbt to improve data flowing into Looker
-Spearhead the formulation of the company’s data vision, mission, core values, and data management framework
-Conduct data maturity assessments for various departments and develop an improvement roadmap 
-Skills: data governance • data management • data quality • project management • advanced Python • critical thinking • cross-functional collaboration
+<ul> <li>Develop a data governance model, process documentation, and training resources for both users and analysts
+<li> Collaborate on the redesign of the data model for the BI platform, Looker 
+<li> Transform data and build models in dbt to improve data flowing into Looker
+<li> Spearhead the formulation of the company’s data vision, mission, core values, and data management framework
+<li> Conduct data maturity assessments for various departments and develop an improvement roadmap 
+<li> Skills: data governance • data management • data quality • project management • advanced Python • critical thinking • cross-functional collaboration
  </li>
  
 <li> Database Remodel Project | January 2019 - June 2022
-Overhauled 20-year-old Access database comprised of relational data structures by using advanced  SQL queries and VBA code 
-Assembled and supervised the database management team 
-Created a modern, streamlined, and automated workflow management system that has increased  office productivity and efficiency 
-Skills: data governance • data management • customer data • team focused • collaboration • documentation • data modeling • visualization • program development • training • assessment strategies • leadership • data visualization • data collection processes • databases
+<ul> <li>Overhauled 20-year-old Access database comprised of relational data structures by using advanced  SQL queries and VBA code 
+<li>Assembled and supervised the database management team 
+<li>Created a modern, streamlined, and automated workflow management system that has increased  office productivity and efficiency 
+<li>Skills: data governance • data management • customer data • team focused • collaboration • documentation • data modeling • visualization • program development • training • assessment strategies • leadership • data visualization • data collection processes • databases
  </li>
 </ul>
 
