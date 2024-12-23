@@ -15,6 +15,7 @@ I have a lot of interests and I am _really_ interested in learning about why I l
 <ul>
    <li><a href="https://github.com/kjchrz03/karolines-questions/blob/main/Generic%20Data%20Strategy%20Proposal.pdf">Sample Data Strategy Approach and Framework</a></li>
    <li><a href="https://github.com/kjchrz03/karolines-questions/blob/main/Data%20Management%20Consult.pdf">Conducting a High Level Evaluation</a></li>
+   <li><a href="https://github.com/kjchrz03/karolines-questions/blob/main/Proposal%20Data%20Governance.pptx.pdf">Data Management Program Proposal & Roadmap</a></li>
 </ul>
 
 ## I also enjoy presenting about my data:
